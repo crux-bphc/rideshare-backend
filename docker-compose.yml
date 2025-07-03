@@ -30,7 +30,7 @@ services:
   db-staging:
     image: postgres:17.5-bookworm
     env_file:
-      - .env.dev
+      - .env.staging
     user: 1001:1001
     volumes:
       - ./db-data:/var/lib/postgresql/data
