@@ -5,19 +5,29 @@ services:
     build: .
     ports:
       - "8102:8000"
+    depends_on:
+      - db
     profiles:
       - prod
 
   web-dev:
     build: .
     ports:
-      - "8100:8000"
+      - "8000:8000"
     depends_on:
-      - db-dev
+      - db
     profiles:
       - dev
+  web-staging:
+    build: .
+    ports:
+      - "8101:8000"
+    depends_on:
+      - db-staging
+    profiles:
+      - staging
   
-  db-dev:
+  db-staging:
     image: postgres:17.5-bookworm
     env_file:
       - .env.dev
@@ -31,9 +41,9 @@ services:
       timeout: 10s
       retries: 3
     profiles:
-      - dev
+      - staging
 
-  db-prod:
+  db:
     image: postgres:17.5-bookworm
     env_file:
       - .env
@@ -46,4 +56,5 @@ services:
       timeout: 10s
       retries: 3
     profiles:
+      - dev
       - prod
