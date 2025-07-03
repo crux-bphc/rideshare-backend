@@ -1,0 +1,60 @@
+name: rideshare-backend
+
+services:
+  web-prod:
+    build: .
+    ports:
+      - "8102:8000"
+    depends_on:
+      - db
+    profiles:
+      - prod
+
+  web-dev:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    profiles:
+      - dev
+  web-staging:
+    build: .
+    ports:
+      - "8100:8000"
+    depends_on:
+      - db-staging
+    profiles:
+      - staging
+  
+  db-staging:
+    image: postgres:17.5-bookworm
+    env_file:
+      - .env.staging
+    user: 1001:1001
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - staging
+
+  db:
+    image: postgres:17.5-bookworm
+    env_file:
+      - .env
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - dev
+      - prod
