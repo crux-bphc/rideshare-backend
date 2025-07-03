@@ -9,7 +9,11 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello, World!");
+  res.send("Dev Env Working Properly!");
+});
+
+app.listen(8000, () => {
+  console.log("Server is running on http://localhost:8000");
 });
 
 export default app;

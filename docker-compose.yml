@@ -12,12 +12,23 @@ services:
 
   web-dev:
     build: .
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: ./app/src
+        - action: rebuild
+          path: deno.json
+        - action: rebuild
+          path: deno.lock
+    command: deno run --allow-net --allow-env --allow-read --watch src/app.ts
     ports:
       - "8000:8000"
     depends_on:
       - db
     profiles:
       - dev
+
   web-staging:
     build: .
     ports:
