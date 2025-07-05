@@ -20,8 +20,4 @@ app.get("/test-db/", async (_, res) => {
   res.send(allusers);
 });
 
-app.listen(8000, () => {
-  console.log("Server is running on http://localhost:8000");
-});
-
 export default app;

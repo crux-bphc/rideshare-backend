@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-read", "src/app.ts"]
+CMD ["deno", "run", "dev"]
