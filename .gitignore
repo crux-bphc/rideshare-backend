@@ -1,3 +1,4 @@
 db-data
+drizzle-cli
 .env*
 !.env.example
