@@ -7,7 +7,6 @@
     "@types/express": "npm:@types/express@^5.0.3",
     "drizzle-orm": "npm:drizzle-orm@^0.44.2",
     "express": "npm:express@^5.1.0",
-    "pg": "npm:pg@^8.16.3",
     "postgres": "npm:postgres@^3.4.7"
   }
 }
