@@ -4,7 +4,7 @@ import { RequestHandler, Router } from "express";
 
 export const oauth = Router();
 
-const JWKSLogToURL = new URL("https://3r82t3.logto.app/oidc/jwks");
+const JWKSLogToURL = new URL("https://logto.local.crux-bphc.com/oidc/jwks");
 
 const jwtOptions = {
   audience: [Deno.env.get("LOGTO_APP_ID")!],
@@ -43,7 +43,7 @@ export const ouathMiddleware: RequestHandler = async (req, res, next) => {
 
   try {
     const claims = await jwt.jwtVerify(token, keyfunc, jwtOptions);
-    console.log("claims", claims);
+    res.locals.claims = claims;
   } catch (err) {
     res
       .status(400) // Bad request
