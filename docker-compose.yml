@@ -23,7 +23,7 @@ services:
           path: deno.json
         - action: rebuild
           path: deno.lock
-    command: deno run --allow-net --allow-env --allow-read --watch=poll main.ts
+    command: deno run --allow-net --allow-env --allow-read --watch src/app.ts
     ports:
       - "8000:8000"
     depends_on:
