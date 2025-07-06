@@ -4,20 +4,17 @@ import { RequestHandler, Router } from "express";
 
 export const oauth = Router();
 
-const JWKSLogToURL = new URL("https://logto.local.crux-bphc.com/oidc/jwks");
+const JWKSLogToURL = new URL(Deno.env.get("JWKS_URI")!);
 
 const jwtOptions = {
-  audience: [Deno.env.get("LOGTO_APP_ID")!],
+  // This didn't work for me, but the jwt had the audience in it already
+  // audience: Deno.env.get('LOGTO_APP_ID')!,
   maxTokenAge: 600000, // 10 min
 };
 
-const keyfunc = jwt.createRemoteJWKSet(JWKSLogToURL, {
-  /* any options? */
-});
+const keyfunc = jwt.createRemoteJWKSet(JWKSLogToURL);
 
 export const ouathMiddleware: RequestHandler = async (req, res, next) => {
-  console.log("verifying...");
-
   let token = (req.query.token ?? "") as string;
 
   if (req.query.token === undefined) {
@@ -44,6 +41,9 @@ export const ouathMiddleware: RequestHandler = async (req, res, next) => {
   try {
     const claims = await jwt.jwtVerify(token, keyfunc, jwtOptions);
     res.locals.claims = claims;
+    console.log(
+      `Verified user: Audience ${claims.payload.aud}, Sub ${claims.payload.sub}`
+    );
   } catch (err) {
     res
       .status(400) // Bad request
@@ -55,4 +55,5 @@ export const ouathMiddleware: RequestHandler = async (req, res, next) => {
 };
 
 // Add user verification through middleware
+// Should it be here for all /api or as a case by case basis?
 oauth.use(ouathMiddleware);

@@ -17,9 +17,8 @@ app.get("/", (_, res) => {
 
 app.use("/api/", oauth);
 
-app.get("/api/test-db/", async (_, res) => {
+app.post("/api/test-db/", async (_, res) => {
   const allusers = await db.select().from(users);
-
   res.send(allusers);
 });
 
