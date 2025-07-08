@@ -23,7 +23,7 @@ services:
           path: deno.json
         - action: rebuild
           path: deno.lock
-    command: deno run --allow-net --allow-env --allow-read --watch src/app.ts
+    command: deno run --allow-net --allow-env --allow-read --watch main.ts
     ports:
       - "8000:8000"
     depends_on:
@@ -33,6 +33,8 @@ services:
 
   web-staging:
     build: .
+    env_file:
+      - .env.staging
     ports:
       - "8100:8000"
     depends_on:
@@ -46,6 +48,7 @@ services:
       - .env.staging
     user: 1001:1001
     volumes:
+      - ./src/db/migration/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./db-data:/var/lib/postgresql/data
     restart: always
     healthcheck:
