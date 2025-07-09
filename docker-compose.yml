@@ -23,7 +23,6 @@ services:
           path: deno.json
         - action: rebuild
           path: deno.lock
-    command: deno run dev
     ports:
       - "8000:8000"
     depends_on:
