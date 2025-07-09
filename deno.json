@@ -4,7 +4,7 @@
     "db": "deno --env -A --node-modules-dir npm:drizzle-kit"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1",
+    "@std/assert": "jsr:@std/assert@^1.0.13",
     "@types/express": "npm:@types/express@^5.0.3",
     "drizzle-orm": "npm:drizzle-orm@^0.44.2",
     "jose": "npm:jose@^6.0.11",
