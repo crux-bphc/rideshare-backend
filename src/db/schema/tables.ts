@@ -1,4 +1,5 @@
 import {
+  index,
   integer,
   pgTable,
   primaryKey,
@@ -6,6 +7,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -56,4 +58,5 @@ export const stops = pgTable("stops", {
   order: integer().notNull(),
 }, (table) => [
   primaryKey({ columns: [table.rideId, table.order] }),
+  index("stop_location_search_index").using("gin", sql`location gin_trgm_ops`),
 ]);
