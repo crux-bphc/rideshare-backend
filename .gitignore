@@ -2,3 +2,4 @@ db-data
 drizzle-cli
 .env*
 !.env.example
+node_modules

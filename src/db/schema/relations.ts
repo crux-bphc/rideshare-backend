@@ -6,7 +6,7 @@ import {
   userBookmarks,
   userRequests,
   users,
-} from "./schema.ts";
+} from "./tables.ts";
 
 export const ridesRelations = relations(rides, ({ one, many }) => ({
   user: one(users, {
