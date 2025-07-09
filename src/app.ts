@@ -1,6 +1,5 @@
 import express from "express";
-import { db } from "./db/client.ts";
-import { users } from "./db/schema/tables.ts";
+import routes from "./routes/index.ts"
 import { logtoMiddleware } from "./middleware/logto.ts";
 
 const app = express();
@@ -17,10 +16,6 @@ app.get("/", (_, res) => {
 
 app.use(logtoMiddleware);
 
-app.get("/users", async (_, res) => {
-  const result = await db.select().from(users);
-
-  res.send(result);
-});
+app.use(routes);
 
 export default app;

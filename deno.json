@@ -1,9 +1,6 @@
 {
   "tasks": {
     "dev": "deno run --watch --allow-net --allow-env --allow-read main.ts",
-    "db:generate": "deno --env -A --node-modules-dir npm:drizzle-kit generate",
-    "db:migrate": "deno --env -A --node-modules-dir npm:drizzle-kit migrate",
-    "db:studio": "deno --env -A --node-modules-dir npm:drizzle-kit studio",
     "db": "deno --env -A --node-modules-dir npm:drizzle-kit"
   },
   "imports": {

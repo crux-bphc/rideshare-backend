@@ -3,12 +3,10 @@ FROM denoland/deno:2.4.0
 WORKDIR /app
 
 # Root user by default — copy files
-COPY deno.json deno.lock ./
-RUN chown deno:deno deno.json deno.lock
+COPY . .
+RUN chown -R deno:deno /app
 
 USER deno
-
-COPY . .
 
 EXPOSE 8000
 
