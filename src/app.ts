@@ -1,6 +1,6 @@
 import express from "express";
 import { db } from "./db/client.ts";
-import { users } from "./db/schema.ts";
+import { users } from "./db/schema/tables.ts";
 import { logtoMiddleware } from "./middleware/logto.ts";
 
 const app = express();
