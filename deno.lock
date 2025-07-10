@@ -6,10 +6,12 @@
     "npm:@types/express@^5.0.3": "5.0.3",
     "npm:drizzle-kit@*": "0.31.4_esbuild@0.25.6",
     "npm:drizzle-orm@~0.44.2": "0.44.2_pg@8.16.3_postgres@3.4.7",
+    "npm:drizzle-zod@~0.8.2": "0.8.2_drizzle-orm@0.44.2__pg@8.16.3__postgres@3.4.7_zod@3.25.76_pg@8.16.3_postgres@3.4.7",
     "npm:express@^5.1.0": "5.1.0",
     "npm:jose@^6.0.11": "6.0.11",
     "npm:pg@^8.16.3": "8.16.3",
-    "npm:postgres@^3.4.7": "3.4.7"
+    "npm:postgres@^3.4.7": "3.4.7",
+    "npm:zod@^3.25.76": "3.25.76"
   },
   "jsr": {
     "@std/assert@1.0.13": {
@@ -429,6 +431,13 @@
       "optionalPeers": [
         "pg",
         "postgres"
+      ]
+    },
+    "drizzle-zod@0.8.2_drizzle-orm@0.44.2__pg@8.16.3__postgres@3.4.7_zod@3.25.76_pg@8.16.3_postgres@3.4.7": {
+      "integrity": "sha512-9Do/16OjFFNrQDZgvMtxtDDwKWbFOxUAIwNPKX98SfxrP8H18vhN1BvNXbhelLcdgCE7GEaXDJqBjMExSkhpkA==",
+      "dependencies": [
+        "drizzle-orm",
+        "zod"
       ]
     },
     "dunder-proto@1.0.1": {
@@ -914,6 +923,9 @@
     },
     "xtend@4.0.2": {
       "integrity": "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="
+    },
+    "zod@3.25.76": {
+      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     }
   },
   "remote": {
@@ -991,10 +1003,12 @@
       "jsr:@std/assert@^1.0.13",
       "npm:@types/express@^5.0.3",
       "npm:drizzle-orm@~0.44.2",
+      "npm:drizzle-zod@~0.8.2",
       "npm:express@^5.1.0",
       "npm:jose@^6.0.11",
       "npm:pg@^8.16.3",
-      "npm:postgres@^3.4.7"
+      "npm:postgres@^3.4.7",
+      "npm:zod@^3.25.76"
     ]
   }
 }

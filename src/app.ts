@@ -1,5 +1,5 @@
 import express from "express";
-import routes from "./routes/index.ts"
+import routes from "./routes/index.ts";
 import { logtoMiddleware } from "./middleware/logto.ts";
 
 const app = express();
