@@ -38,7 +38,7 @@ export const logtoMiddleware: RequestHandler = async (req, res, next) => {
       keyfunc,
       jwtOptions,
     );
-    res.locals.claims = claims;
+    res.locals.user = claims.payload;
     console.log(
       `Verified user: Audience ${claims.payload.aud}, Sub ${claims.payload.sub}`,
     );
