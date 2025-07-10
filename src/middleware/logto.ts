@@ -1,7 +1,7 @@
-// Use npm package or this?
 import * as jwt from "jose";
 import { RequestHandler } from "express";
 import { logtoClientId, logtoJwkUrl } from "../consts.ts";
+import { RideShareJWTPayload } from "../types.d.ts";
 
 const JWKSLogToURL = new URL(logtoJwkUrl);
 
@@ -33,7 +33,11 @@ export const logtoMiddleware: RequestHandler = async (req, res, next) => {
   const token = split[1];
 
   try {
-    const claims = await jwt.jwtVerify(token, keyfunc, jwtOptions);
+    const claims = await jwt.jwtVerify<RideShareJWTPayload>(
+      token,
+      keyfunc,
+      jwtOptions,
+    );
     res.locals.claims = claims;
     console.log(
       `Verified user: Audience ${claims.payload.aud}, Sub ${claims.payload.sub}`,
