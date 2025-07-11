@@ -9,11 +9,3 @@ export type RideShareJWTPayload = {
   email_verified: boolean;
   created_at: number;
 } & JWTPayload;
-
-declare global {
-  namespace Express {
-    interface Locals {
-      claims: RideShareJWTPayload;
-    }
-  }
-}
