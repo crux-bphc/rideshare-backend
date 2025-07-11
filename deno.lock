@@ -4,6 +4,7 @@
     "jsr:@std/assert@^1.0.13": "1.0.13",
     "jsr:@std/internal@^1.0.6": "1.0.9",
     "npm:@types/express@^5.0.3": "5.0.3",
+    "npm:@types/node@*": "22.15.15",
     "npm:drizzle-kit@*": "0.31.4_esbuild@0.25.6",
     "npm:drizzle-orm@~0.44.2": "0.44.2_pg@8.16.3_postgres@3.4.7",
     "npm:drizzle-zod@~0.8.2": "0.8.2_drizzle-orm@0.44.2__pg@8.16.3__postgres@3.4.7_zod@3.25.76_pg@8.16.3_postgres@3.4.7",
