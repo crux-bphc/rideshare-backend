@@ -1,7 +1,7 @@
 import * as jwt from "jose";
 import { RequestHandler } from "express";
 import { logtoClientId, logtoJwkUrl } from "../consts.ts";
-import { RideShareJWTPayload } from "../types.d.ts";
+import { RideShareJWTPayload } from "../types/jwt.ts";
 
 const JWKSLogToURL = new URL(logtoJwkUrl);
 
