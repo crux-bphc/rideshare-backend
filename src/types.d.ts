@@ -5,7 +5,7 @@ export type RideShareJWTPayload = {
   name: string;
   picture: string;
   updated_at: number;
-  username: string | null;
+  username: string;
   email_verified: boolean;
   created_at: number;
 } & JWTPayload;
