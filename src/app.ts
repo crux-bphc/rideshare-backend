@@ -4,6 +4,8 @@ import { logtoMiddleware } from "./middleware/logto.ts";
 
 const app = express();
 
+app.use(express.json());
+
 // log requests
 app.use((req, _, next) => {
   console.log(`${req.method}: ${req.url}`);
