@@ -2,6 +2,9 @@ import express from "express";
 import { db } from "../db/client.ts";
 import { users } from "../db/schema/tables.ts";
 
+import { validateRequest } from "../middleware/zod_validation.ts";
+import { z } from "zod";
+
 const router = express.Router();
 
 router.get("/", async (_, res) => {
@@ -12,6 +15,8 @@ router.get("/", async (_, res) => {
   const user = await db.query.users.findFirst({
     where: (users, { eq }) => eq(users.email, email),
   });
+
+  // const user = await db.query.users.findMany(); (for testing)
 
   if (!user) {
     res
@@ -24,20 +29,18 @@ router.get("/", async (_, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  if (!req.body) {
-    res.status(400);
-    return;
-  }
+const userSchema = z.looseObject({
+  email: z.email(),
+  phone: z.number(),
+});
+
+router.post("/", validateRequest(userSchema), async (req, res) => {
+  console.log(req.body);
 
   const name: string = req.body?.name ?? res.locals.user.name;
   const email: string = res.locals.user.email;
-  const phoneNumber = req.body?.phone;
-
-  if (!phoneNumber) {
-    res.status(422).json({ message: "Phone number not provided." });
-    return;
-  }
+  // const email: string = req.body.email; (for testing)
+  const phoneNumber = req.body.phone;
 
   await db.insert(users).values({
     phoneNumber,
