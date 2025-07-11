@@ -1,6 +1,6 @@
 import express, { Request } from "express";
 import { db } from "../db/client.ts";
-import { rideMembers, userRequests } from "../db/schema/tables.ts";
+import { rideMembers, rides, userRequests } from "../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get("/search", async (_, res) => {
 
 // Helper middleware to populate userId in the locals field
 router.use(async (_, res, next) => {
-  const email = res.locals?.user?.email;
+  const email = res.locals.user.email;
 
   if (!email) {
     // Unauthorized
@@ -70,13 +70,31 @@ router.post("/request/:rideId", async (
       where: (rides, { eq }) => eq(rides.id, rideId),
     });
 
-    const member_count = (await db.query.rideMembers.findMany({
-      columns: { rideId: false, userId: false },
+    if (!ride) {
+      res.status(404).json({
+        message: "The given ride was not found!",
+      });
+      return;
+    }
+
+    const rideMembers = await db.query.rideMembers.findMany({
       where: (members, { eq }) => eq(members.rideId, rideId),
-    })).length;
+    });
+
+    // User is already in ride / they created the ride
+    if (
+      rideMembers.filter((member) => member.userId == userId).length > 0 ||
+      ride.createdBy == userId
+    ) {
+      // Conflict
+      res.status(409).json({
+        message: "The given user is already a member of the ride",
+      });
+      return;
+    }
 
     // Should this be checked for a request?
-    if (member_count >= (ride?.maxMemberCount ?? 0)) {
+    if (rideMembers.length >= (ride?.maxMemberCount ?? 0)) {
       // Service unavailable
       res.status(503).json({
         message:
@@ -87,7 +105,6 @@ router.post("/request/:rideId", async (
 
     // Check if request already exists
     const exists = await db.query.userRequests.findFirst({
-      columns: { userId: false, rideId: false, status: false },
       where: (requests, { eq, and }) =>
         and(eq(requests.rideId, rideId), eq(requests.userId, userId)),
     });
@@ -109,7 +126,7 @@ router.post("/request/:rideId", async (
     });
     return;
   }
-  res.status(200);
+  res.end();
 });
 
 // Accept or reqject a ride request
@@ -126,7 +143,7 @@ router.post(
     const { userId } = res.locals;
     if (!userId) return;
 
-    if (!req.params?.rideId || !req.body?.requestUserId || req.body?.status) {
+    if (!req.params?.rideId || !req.body?.requestUserId || !req.body?.status) {
       // Bad request
       res.status(400).json({
         message: "No ride id / request user id / status provided!",
@@ -135,7 +152,7 @@ router.post(
     }
 
     const rideId = parseInt(req.params.rideId);
-    const { requestUserId: requestUserId, status } = req.body;
+    const { requestUserId, status } = req.body;
 
     try {
       // Check if ride members can allow another member into the ride
@@ -153,7 +170,6 @@ router.post(
       }
 
       const member_count = (await db.query.rideMembers.findMany({
-        columns: { rideId: false, userId: false },
         where: (members, { eq }) => eq(members.rideId, rideId),
       })).length;
 
@@ -168,7 +184,6 @@ router.post(
 
       // Check if member already exists
       const exists = await db.query.rideMembers.findFirst({
-        columns: { rideId: false, userId: false },
         where: (members, { eq, and }) =>
           and(eq(members.rideId, rideId), eq(members.userId, requestUserId)),
       });
@@ -200,7 +215,7 @@ router.post(
       });
       return;
     }
-    res.status(200);
+    res.end();
   },
 );
 
@@ -223,6 +238,13 @@ router.delete("/:rideId", async (req, res) => {
     where: (rides, { eq }) => eq(rides.id, rideId),
   });
 
+  if (!ride) {
+    res.status(404).json({
+      message: "The given ride was not found!",
+    });
+    return;
+  }
+
   // Check if the ride actually belongs to the user
   if ((ride?.createdBy ?? -1) !== userId) {
     res.status(401).json({
@@ -231,6 +253,10 @@ router.delete("/:rideId", async (req, res) => {
     });
     return;
   }
+
+  await db.delete(rides).where(eq(rides.id, rideId));
+
+  res.end();
 });
 
 export default router;

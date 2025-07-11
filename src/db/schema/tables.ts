@@ -13,7 +13,7 @@ import { sql } from "drizzle-orm";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   phoneNumber: varchar("phone_number"),
-  email: varchar(),
+  email: varchar().unique(),
   name: varchar(),
 });
 
@@ -35,7 +35,11 @@ export const rideMembers = pgTable("ride_members", {
   }),
 ]);
 
-export const RequestStatusEnum = pgEnum('request_status', ["accepted", "declined", "pending"])
+export const RequestStatusEnum = pgEnum("request_status", [
+  "accepted",
+  "declined",
+  "pending",
+]);
 
 export const userRequests = pgTable("user_requests", {
   userId: integer("user_id").notNull().references(() => users.id),
