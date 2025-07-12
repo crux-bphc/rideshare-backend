@@ -1,7 +1,10 @@
-import express, { Request } from "express";
+import express, { Request, Response } from "express";
 import { db } from "../db/client.ts";
 import { rideMembers, rides, userRequests } from "../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
+import { StatusCodes } from "http-status-codes";
+import z from "zod";
+import { validateRequest } from "../middleware/zod_validate.ts";
 
 const router = express.Router();
 
@@ -23,8 +26,9 @@ router.use(async (_, res, next) => {
   const email = res.locals.user.email;
 
   if (!email) {
-    // Unauthorized
-    res.status(401).json({ message: "User not authenticated!" });
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "User not authenticated!",
+    });
     return;
   }
 
@@ -34,8 +38,7 @@ router.use(async (_, res, next) => {
   }))?.id;
 
   if (!userId) {
-    // User not found
-    res.status(404).json({ message: "User does not exist!" });
+    res.status(StatusCodes.NOT_FOUND).json({ message: "User does not exist!" });
     return;
   }
 
@@ -57,8 +60,9 @@ router.post("/request/:rideId", async (
   if (!userId) return;
 
   if (!req.params?.rideId) {
-    // Bad request
-    res.status(400).json({ message: "No ride id provided!" });
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "No ride id provided!",
+    });
     return;
   }
 
@@ -71,7 +75,7 @@ router.post("/request/:rideId", async (
     });
 
     if (!ride) {
-      res.status(404).json({
+      res.status(StatusCodes.NOT_FOUND).json({
         message: "The given ride was not found!",
       });
       return;
@@ -86,8 +90,7 @@ router.post("/request/:rideId", async (
       rideMembers.filter((member) => member.userId == userId).length > 0 ||
       ride.createdBy == userId
     ) {
-      // Conflict
-      res.status(409).json({
+      res.status(StatusCodes.CONFLICT).json({
         message: "The given user is already a member of the ride",
       });
       return;
@@ -95,8 +98,7 @@ router.post("/request/:rideId", async (
 
     // Should this be checked for a request?
     if (rideMembers.length >= (ride?.maxMemberCount ?? 0)) {
-      // Service unavailable
-      res.status(503).json({
+      res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         message:
           "The requested ride is already full! Try requesting later when space is available or try finding another similar ride.",
       });
@@ -111,7 +113,7 @@ router.post("/request/:rideId", async (
 
     if (exists) {
       // Conflict
-      res.status(409).json({
+      res.status(StatusCodes.CONFLICT).json({
         message:
           "Ride request from this user already exists for the given ride!",
       });
@@ -120,8 +122,7 @@ router.post("/request/:rideId", async (
 
     await db.insert(userRequests).values({ userId, rideId, status: "pending" });
   } catch (_) {
-    // Unknown error - should it be an internal server error?
-    res.status(520).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Failed to create a ride request! Please try again later",
     });
     return;
@@ -129,24 +130,25 @@ router.post("/request/:rideId", async (
   res.end();
 });
 
+const manageSchema = z.looseObject({
+  requestUserId: z.int(),
+  status: z.enum(["accepted", "denied"]),
+});
+
 // Accept or reqject a ride request
 router.post(
   "/manage/:rideId",
+  validateRequest(manageSchema),
   async (
-    req: Request<
-      Record<PropertyKey, never>,
-      { message?: string },
-      ManageRideEndpoint
-    >,
-    res,
+    req: Request,
+    res: Response,
   ) => {
     const { userId } = res.locals;
     if (!userId) return;
 
-    if (!req.params?.rideId || !req.body?.requestUserId || !req.body?.status) {
-      // Bad request
-      res.status(400).json({
-        message: "No ride id / request user id / status provided!",
+    if (!req.params?.rideId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        message: "No ride id provided!",
       });
       return;
     }
@@ -162,20 +164,32 @@ router.post(
 
       // Check if the ride actually belongs to the user
       if ((ride?.createdBy ?? -1) !== userId) {
-        res.status(401).json({
+        res.status(StatusCodes.UNAUTHORIZED).json({
           message:
             "The current user cannot change the given ride data! User is not the owner of the ride.",
         });
         return;
       }
 
+      // Check if the given user id is in the ride requests
+      const requestUser = await db.query.userRequests.findFirst({
+        where: (user, { eq }) => eq(user.userId, requestUserId),
+      });
+
+      if (!requestUser) {
+        res.status(StatusCodes.NOT_FOUND).json({
+          message: "User that requested to join the ride was not found!",
+        });
+        return;
+      }
+
+      // Check if ride members can allow another member into the ride
       const member_count = (await db.query.rideMembers.findMany({
         where: (members, { eq }) => eq(members.rideId, rideId),
       })).length;
 
       if (member_count >= (ride?.maxMemberCount ?? 0)) {
-        // Service unavailable
-        res.status(503).json({
+        res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
           message:
             "This ride is already full! This request cannot be accepted unless you change the max member count or remove someone from your ride.",
         });
@@ -189,8 +203,7 @@ router.post(
       });
 
       if (exists) {
-        // Conflict
-        res.status(409).json({
+        res.status(StatusCodes.CONFLICT).json({
           message: "This ride member already exists for the given ride!",
         });
         return;
@@ -203,13 +216,12 @@ router.post(
           eq(userRequests.rideId, rideId),
         ),
       );
-      if (status == "accepted") {
+      if (status === "accepted") {
         // Add member
         await db.insert(rideMembers).values({ userId: requestUserId, rideId });
       }
     } catch (_) {
-      // Unknown error - should it be an internal server error?
-      res.status(520).json({
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message:
           `Failed to set request status to ${status}! Please try again later`,
       });
@@ -225,8 +237,7 @@ router.delete("/:rideId", async (req, res) => {
   if (!userId) return;
 
   if (!req.params?.rideId) {
-    // Bad request
-    res.status(400).json({
+    res.status(StatusCodes.BAD_REQUEST).json({
       message: "No ride id provided!",
     });
     return;
@@ -239,7 +250,7 @@ router.delete("/:rideId", async (req, res) => {
   });
 
   if (!ride) {
-    res.status(404).json({
+    res.status(StatusCodes.NOT_FOUND).json({
       message: "The given ride was not found!",
     });
     return;
@@ -247,7 +258,7 @@ router.delete("/:rideId", async (req, res) => {
 
   // Check if the ride actually belongs to the user
   if ((ride?.createdBy ?? -1) !== userId) {
-    res.status(401).json({
+    res.status(StatusCodes.UNAUTHORIZED).json({
       message:
         "The current user cannot delete the ride! User is not the owner of the ride.",
     });
