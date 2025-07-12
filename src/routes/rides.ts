@@ -1,6 +1,11 @@
 import express from "express";
 import { db } from "../db/client.ts";
-import { rideMembers, rides, userRequests } from "../db/schema/tables.ts";
+import {
+  rideMembers,
+  rides,
+  stops,
+  userRequests,
+} from "../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
@@ -45,6 +50,77 @@ router.use(async (_, res, next) => {
   res.locals.userId = userId;
 
   next();
+});
+
+const rideCreateSchema = z.looseObject({
+  departureStartTime: z.coerce.date(),
+  departureEndTime: z.coerce.date(),
+  comments: z.string(),
+  maxMemberCount: z.int().min(1), // Must have space for at least the owner
+  rideStops: z.array(z.string()).min(2), // Must have start and end location
+});
+
+interface Ride {
+  departureStartTime: string;
+  departureEndTime: string;
+  comments: string;
+  maxMemberCount: number;
+  rideStops: string[];
+}
+
+// Create a new ride
+router.post("/", validateRequest(rideCreateSchema), async (req, res) => {
+  const { userId } = res.locals;
+  if (!userId) return;
+
+  const {
+    departureStartTime,
+    departureEndTime,
+    comments,
+    maxMemberCount,
+    rideStops,
+  }: Ride = req.body;
+
+  const start = (new Date(departureStartTime)).getTime(),
+    end = (new Date(departureEndTime)).getTime(),
+    now = Date.now();
+  
+  // Don't create rides that run before creation time
+  if (start < now || end < now || end < start) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Invalid departure start and / or end time!",
+    });
+    return;
+  }
+
+  try {
+    const rideId = (await db.insert(rides).values({
+      createdBy: userId,
+      departureEndTime,
+      departureStartTime,
+      comments,
+      maxMemberCount,
+    }).returning())[0].id;
+
+    // Add a `1` indexed ordered location of stops based on the given list of strings corresponding to locations
+    await db.insert(stops).values(rideStops.map((value, index) => {
+      return {
+        order: index + 1,
+        rideId,
+        location: value,
+      };
+    }));
+
+    // Insert the owner as a ride member
+    await db.insert(rideMembers).values({ rideId, userId });
+  } catch (_) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to create a ride request! Please try again later",
+    });
+    return;
+  }
+
+  res.end();
 });
 
 // Request to join a ride
