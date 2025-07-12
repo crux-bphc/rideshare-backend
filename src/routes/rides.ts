@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { db } from "../db/client.ts";
 import { rideMembers, rides, userRequests } from "../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
@@ -48,14 +48,7 @@ router.use(async (_, res, next) => {
 });
 
 // Request to join a ride
-router.post("/request/:rideId", async (
-  req: Request<
-    Record<PropertyKey, never>,
-    { message?: string },
-    Record<PropertyKey, never>
-  >,
-  res,
-) => {
+router.post("/request/:rideId", async (req, res) => {
   const { userId } = res.locals;
   if (!userId) return;
 
@@ -81,13 +74,13 @@ router.post("/request/:rideId", async (
       return;
     }
 
-    const rideMembers = await db.query.rideMembers.findMany({
+    const members = await db.query.rideMembers.findMany({
       where: (members, { eq }) => eq(members.rideId, rideId),
     });
 
     // User is already in ride / they created the ride
     if (
-      rideMembers.filter((member) => member.userId == userId).length > 0 ||
+      members.filter((member) => member.userId == userId).length > 0 ||
       ride.createdBy == userId
     ) {
       res.status(StatusCodes.CONFLICT).json({
@@ -97,7 +90,7 @@ router.post("/request/:rideId", async (
     }
 
     // Should this be checked for a request?
-    if (rideMembers.length >= (ride?.maxMemberCount ?? 0)) {
+    if (members.length >= (ride?.maxMemberCount ?? 0)) {
       res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         message:
           "The requested ride is already full! Try requesting later when space is available or try finding another similar ride.",
@@ -139,10 +132,7 @@ const manageSchema = z.looseObject({
 router.post(
   "/manage/:rideId",
   validateRequest(manageSchema),
-  async (
-    req: Request,
-    res: Response,
-  ) => {
+  async (req, res) => {
     const { userId } = res.locals;
     if (!userId) return;
 
@@ -157,7 +147,6 @@ router.post(
     const { requestUserId, status } = req.body;
 
     try {
-      // Check if ride members can allow another member into the ride
       const ride = await db.query.rides.findFirst({
         where: (rides, { eq }) => eq(rides.id, rideId),
       });
@@ -183,12 +172,12 @@ router.post(
         return;
       }
 
-      // Check if ride members can allow another member into the ride
-      const member_count = (await db.query.rideMembers.findMany({
+      const members = await db.query.rideMembers.findMany({
         where: (members, { eq }) => eq(members.rideId, rideId),
-      })).length;
+      });
 
-      if (member_count >= (ride?.maxMemberCount ?? 0)) {
+      // Check if ride members can allow another member into the ride
+      if (members.length >= (ride?.maxMemberCount ?? 0)) {
         res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
           message:
             "This ride is already full! This request cannot be accepted unless you change the max member count or remove someone from your ride.",
@@ -197,12 +186,10 @@ router.post(
       }
 
       // Check if member already exists
-      const exists = await db.query.rideMembers.findFirst({
-        where: (members, { eq, and }) =>
-          and(eq(members.rideId, rideId), eq(members.userId, requestUserId)),
-      });
-
-      if (exists) {
+      if (
+        members.filter((member) => member.userId == requestUserId).length >
+          0
+      ) {
         res.status(StatusCodes.CONFLICT).json({
           message: "This ride member already exists for the given ride!",
         });
