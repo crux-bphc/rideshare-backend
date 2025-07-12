@@ -55,7 +55,7 @@ router.use(async (_, res, next) => {
 const rideCreateSchema = z.looseObject({
   departureStartTime: z.coerce.date(),
   departureEndTime: z.coerce.date(),
-  comments: z.string(),
+  comments: z.string().nullable(),
   maxMemberCount: z.int().min(1), // Must have space for at least the owner
   rideStops: z.array(z.string()).min(2), // Must have start and end location
 });
@@ -76,7 +76,7 @@ router.post("/", validateRequest(rideCreateSchema), async (req, res) => {
   const {
     departureStartTime,
     departureEndTime,
-    comments,
+    comments = "",
     maxMemberCount,
     rideStops,
   }: Ride = req.body;
@@ -84,7 +84,7 @@ router.post("/", validateRequest(rideCreateSchema), async (req, res) => {
   const start = (new Date(departureStartTime)).getTime(),
     end = (new Date(departureEndTime)).getTime(),
     now = Date.now();
-  
+
   // Don't create rides that run before creation time
   if (start < now || end < now || end < start) {
     res.status(StatusCodes.BAD_REQUEST).json({
