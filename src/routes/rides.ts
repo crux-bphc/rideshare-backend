@@ -1,11 +1,19 @@
 import express from "express";
 import { db } from "../db/client.ts";
-import { rideMembers, userRequests } from "../db/schema/tables.ts";
+import {
+  rideMembers,
+  rides,
+  stops,
+  userRequests,
+} from "../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
+import { StatusCodes } from "http-status-codes";
+import z from "zod";
+import { validateRequest } from "../middleware/zod_validate.ts";
 
 const router = express.Router();
 
-router.get("/", async (_, res) => {
+router.get("/search", async (_, res) => {
   const rides = await db.query.rides.findMany({
     with: {
       stops: {
@@ -15,36 +23,119 @@ router.get("/", async (_, res) => {
       user: true,
     },
   });
-  res.json(rides);
+  res.json({ rides });
 });
 
-router.put("/request", async (req, res) => {
-  const name = res.locals?.claims?.name;
+// Helper middleware to populate userId in the locals field
+router.use(async (_, res, next) => {
+  const email = res.locals.user.email;
 
-  if (!name) {
-    // Unauthorized
-    res.status(401).json({ message: "User not authenticated!" });
+  if (!email) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "User not authenticated!",
+    });
     return;
   }
 
-  // Get user id - this should probably be in the JWT paylod so that this operation is not necessary
+  // Get user id
   const userId = (await db.query.users.findFirst({
-    where: (user, { eq }) => eq(user.name, name),
+    where: (user, { eq }) => eq(user.email, email),
   }))?.id;
 
   if (!userId) {
-    // User not found
-    res.status(404).json({ message: "User does not exist!" });
+    res.status(StatusCodes.NOT_FOUND).json({ message: "User does not exist!" });
     return;
   }
 
-  if (!req.body?.rideId) {
-    // Bad request
-    res.status(400).json({ message: "No ride id provided!" });
+  res.locals.userId = userId;
+
+  next();
+});
+
+const rideCreateSchema = z.looseObject({
+  departureStartTime: z.coerce.date(),
+  departureEndTime: z.coerce.date(),
+  comments: z.string().nullable(),
+  maxMemberCount: z.int().min(1), // Must have space for at least the owner
+  rideStops: z.array(z.string()).min(2), // Must have start and end location
+});
+
+interface Ride {
+  departureStartTime: string;
+  departureEndTime: string;
+  comments: string;
+  maxMemberCount: number;
+  rideStops: string[];
+}
+
+// Create a new ride
+router.post("/", validateRequest(rideCreateSchema), async (req, res) => {
+  const { userId } = res.locals;
+  if (!userId) return;
+
+  const {
+    departureStartTime,
+    departureEndTime,
+    comments = "",
+    maxMemberCount,
+    rideStops,
+  }: Ride = req.body;
+
+  const start = (new Date(departureStartTime)).getTime(),
+    end = (new Date(departureEndTime)).getTime(),
+    now = Date.now();
+
+  // Don't create rides that run before creation time
+  if (start < now || end < now || end < start) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Invalid departure start and / or end time!",
+    });
     return;
   }
 
-  const rideId = req.body.rideId;
+  try {
+    const rideId = (await db.insert(rides).values({
+      createdBy: userId,
+      departureEndTime,
+      departureStartTime,
+      comments,
+      maxMemberCount,
+    }).returning())[0].id;
+
+    // Add a `1` indexed ordered location of stops based on the given list of strings corresponding to locations
+    await db.insert(stops).values(rideStops.map((value, index) => {
+      return {
+        order: index + 1,
+        rideId,
+        location: value,
+      };
+    }));
+
+    // Insert the owner as a ride member
+    await db.insert(rideMembers).values({ rideId, userId });
+  } catch (_) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to create a ride request! Please try again later",
+    });
+    return;
+  }
+
+  res.end();
+});
+
+// Request to join a ride
+router.post("/request/:rideId", async (req, res) => {
+  const { userId } = res.locals;
+  if (!userId) return;
+
+  if (!req.params?.rideId) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "No ride id provided!",
+    });
+    return;
+  }
+
+  const rideId = parseInt(req.params.rideId);
 
   try {
     // Check if ride members can allow another member into the ride
@@ -52,15 +143,31 @@ router.put("/request", async (req, res) => {
       where: (rides, { eq }) => eq(rides.id, rideId),
     });
 
-    const member_count = (await db.query.rideMembers.findMany({
-      columns: { rideId: false, userId: false },
+    if (!ride) {
+      res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given ride was not found!",
+      });
+      return;
+    }
+
+    const members = await db.query.rideMembers.findMany({
       where: (members, { eq }) => eq(members.rideId, rideId),
-    })).length;
+    });
+
+    // User is already in ride / they created the ride
+    if (
+      members.filter((member) => member.userId == userId).length > 0 ||
+      ride.createdBy == userId
+    ) {
+      res.status(StatusCodes.CONFLICT).json({
+        message: "The given user is already a member of the ride",
+      });
+      return;
+    }
 
     // Should this be checked for a request?
-    if (member_count >= (ride?.maxMemberCount ?? 0)) {
-      // Service unavailable
-      res.status(503).json({
+    if (members.length >= (ride?.maxMemberCount ?? 0)) {
+      res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         message:
           "The requested ride is already full! Try requesting later when space is available or try finding another similar ride.",
       });
@@ -68,119 +175,162 @@ router.put("/request", async (req, res) => {
     }
 
     // Check if request already exists
-    const exists = await db.query.userRequests.findMany({
+    const exists = await db.query.userRequests.findFirst({
       where: (requests, { eq, and }) =>
         and(eq(requests.rideId, rideId), eq(requests.userId, userId)),
     });
 
-    if (exists.length > 0) {
+    if (exists) {
       // Conflict
-      res.status(409).json({
+      res.status(StatusCodes.CONFLICT).json({
         message:
           "Ride request from this user already exists for the given ride!",
       });
       return;
     }
 
-    await db.insert(userRequests).values({ userId, rideId });
+    await db.insert(userRequests).values({ userId, rideId, status: "pending" });
   } catch (_) {
-    // Unknown error - should it be an internal server error?
-    res.status(520).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Failed to create a ride request! Please try again later",
     });
     return;
   }
-  res.status(200);
+  res.end();
 });
 
-router.put("/accept", async (req, res) => {
-  const name = res.locals?.claims?.name;
+const manageSchema = z.looseObject({
+  requestUserId: z.int(),
+  status: z.enum(["accepted", "denied"]),
+});
 
-  if (!name) {
-    // Unauthorized
-    res.status(401).json({ message: "User not authenticated!" });
-    return;
-  }
+// Accept or reqject a ride request
+router.post(
+  "/manage/:rideId",
+  validateRequest(manageSchema),
+  async (req, res) => {
+    const { userId } = res.locals;
+    if (!userId) return;
 
-  // Get user id - this should probably be in the JWT paylod so that this operation is not necessary
-  const userId = (await db.query.users.findFirst({
-    where: (user, { eq }) => eq(user.name, name),
-  }))?.id;
+    if (!req.params?.rideId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        message: "No ride id provided!",
+      });
+      return;
+    }
 
-  if (!userId) {
-    // User not found
-    res.status(404).json({ message: "User does not exist!" });
-    return;
-  }
+    const rideId = parseInt(req.params.rideId);
+    const { requestUserId, status } = req.body;
 
-  if (!req.body?.rideId || !req.body?.userId) {
-    // Bad request
-    res.status(400).json({ message: "No ride id / request user id provided!" });
-    return;
-  }
+    try {
+      const ride = await db.query.rides.findFirst({
+        where: (rides, { eq }) => eq(rides.id, rideId),
+      });
 
-  const rideId = req.body.rideId, requestUserId = req.body.userId;
+      // Check if the ride actually belongs to the user
+      if ((ride?.createdBy ?? -1) !== userId) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message:
+            "The current user cannot change the given ride data! User is not the owner of the ride.",
+        });
+        return;
+      }
 
-  try {
-    // Check if ride members can allow another member into the ride
-    const ride = await db.query.rides.findFirst({
-      where: (rides, { eq }) => eq(rides.id, rideId),
-    });
+      // Check if the given user id is in the ride requests
+      const requestUser = await db.query.userRequests.findFirst({
+        where: (user, { eq }) => eq(user.userId, requestUserId),
+      });
 
-    // Check if the ride actually belongs to the user
-    if ((ride?.createdBy ?? -1) !== userId) {
-      res.status(401).json({
+      if (!requestUser) {
+        res.status(StatusCodes.NOT_FOUND).json({
+          message: "User that requested to join the ride was not found!",
+        });
+        return;
+      }
+
+      const members = await db.query.rideMembers.findMany({
+        where: (members, { eq }) => eq(members.rideId, rideId),
+      });
+
+      // Check if ride members can allow another member into the ride
+      if (members.length >= (ride?.maxMemberCount ?? 0)) {
+        res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+          message:
+            "This ride is already full! This request cannot be accepted unless you change the max member count or remove someone from your ride.",
+        });
+        return;
+      }
+
+      // Check if member already exists
+      if (
+        members.filter((member) => member.userId == requestUserId).length >
+          0
+      ) {
+        res.status(StatusCodes.CONFLICT).json({
+          message: "This ride member already exists for the given ride!",
+        });
+        return;
+      }
+
+      // Update request
+      await db.update(userRequests).set({ status }).where(
+        and(
+          eq(userRequests.userId, requestUserId),
+          eq(userRequests.rideId, rideId),
+        ),
+      );
+      if (status === "accepted") {
+        // Add member
+        await db.insert(rideMembers).values({ userId: requestUserId, rideId });
+      }
+    } catch (_) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message:
-          "The current user cannot change the given ride data! User is not the owner of the ride.",
+          `Failed to set request status to ${status}! Please try again later`,
       });
       return;
     }
+    res.end();
+  },
+);
 
-    const member_count = (await db.query.rideMembers.findMany({
-      columns: { rideId: false, userId: false },
-      where: (members, { eq }) => eq(members.rideId, rideId),
-    })).length;
+// Delete a given ride
+router.delete("/:rideId", async (req, res) => {
+  const { userId } = res.locals;
+  if (!userId) return;
 
-    if (member_count >= (ride?.maxMemberCount ?? 0)) {
-      // Service unavailable
-      res.status(503).json({
-        message:
-          "This ride is already full! This request cannot be accepted unless you change the max member count or remove someone from your ride.",
-      });
-      return;
-    }
-
-    // Check if member already exists
-    const exists = await db.query.rideMembers.findMany({
-      where: (members, { eq, and }) =>
-        and(eq(members.rideId, rideId), eq(members.userId, requestUserId)),
-    });
-
-    if (exists.length > 0) {
-      // Conflict
-      res.status(409).json({
-        message: "This ride member already exists for the given ride!",
-      });
-      return;
-    }
-
-    // Remove request
-    await db.delete(userRequests).where(
-      and(
-        eq(userRequests.userId, requestUserId),
-        eq(userRequests.rideId, rideId),
-      ),
-    );
-    // Add member
-    await db.insert(rideMembers).values({ userId: requestUserId, rideId });
-  } catch (_) {
-    // Unknown error - should it be an internal server error?
-    res.status(520).json({
-      message: "Failed to add ride member! Please try again later",
+  if (!req.params?.rideId) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "No ride id provided!",
     });
     return;
   }
-  res.status(200);
+
+  const rideId = parseInt(req.params.rideId);
+
+  const ride = await db.query.rides.findFirst({
+    where: (rides, { eq }) => eq(rides.id, rideId),
+  });
+
+  if (!ride) {
+    res.status(StatusCodes.NOT_FOUND).json({
+      message: "The given ride was not found!",
+    });
+    return;
+  }
+
+  // Check if the ride actually belongs to the user
+  if ((ride?.createdBy ?? -1) !== userId) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      message:
+        "The current user cannot delete the ride! User is not the owner of the ride.",
+    });
+    return;
+  }
+
+  await db.delete(rides).where(eq(rides.id, rideId));
+
+  res.end();
 });
 
 export default router;
