@@ -38,7 +38,7 @@ const manage = async (req: Request, res: Response) => {
 
   // Check if the given user id is in the ride requests
   const requestUser = await db.query.userRequests.findFirst({
-    where: (user, { eq }) => eq(user.userEmail, requestUserEmail),
+    where: (user, { eq, and }) => and(eq(user.userEmail, requestUserEmail), eq(user.rideId, rideId)),
   });
 
   if (!requestUser) {
