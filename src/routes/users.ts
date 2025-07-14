@@ -31,7 +31,9 @@ router.get("/", async (_, res) => {
 
 const userSchema = z.looseObject({
   name: z.string().optional().or(z.literal(undefined)),
-  phone: z.number().gt(Math.pow(10, 9) - 1).lt(Math.pow(10, 10)),
+  phone: z.string().length(10, "Phone number must be of length 10").regex(
+    /^\d+$/,
+  ),
 });
 
 router.post("/", validateRequest(userSchema), async (req, res) => {
