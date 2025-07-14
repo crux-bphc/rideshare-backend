@@ -1,6 +1,6 @@
 {
-  "id": "8d567b82-0906-4951-b25a-32961e5f1433",
-  "prevId": "0bb4ff4c-c67c-429a-8066-5385f86bf1bf",
+  "id": "23d1512d-9712-4061-9ac6-8e19821beb63",
+  "prevId": "6295ee0a-5227-42d6-9e7f-52666ad7e792",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -8,9 +8,9 @@
       "name": "ride_members",
       "schema": "",
       "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
+        "user_email": {
+          "name": "user_email",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -23,38 +23,38 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "ride_members_user_id_users_id_fk": {
-          "name": "ride_members_user_id_users_id_fk",
+        "ride_members_user_email_users_email_fk": {
+          "name": "ride_members_user_email_users_email_fk",
           "tableFrom": "ride_members",
-          "columnsFrom": [
-            "user_id"
-          ],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
+          "columnsFrom": [
+            "user_email"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "columnsTo": [
+            "email"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "ride_members_ride_id_rides_id_fk": {
           "name": "ride_members_ride_id_rides_id_fk",
           "tableFrom": "ride_members",
+          "tableTo": "rides",
           "columnsFrom": [
             "ride_id"
           ],
-          "tableTo": "rides",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "ride_members_user_id_ride_id_pk": {
-          "name": "ride_members_user_id_ride_id_pk",
+        "ride_members_user_email_ride_id_pk": {
+          "name": "ride_members_user_email_ride_id_pk",
           "columns": [
-            "user_id",
+            "user_email",
             "ride_id"
           ]
         }
@@ -76,7 +76,7 @@
         },
         "created_by": {
           "name": "created_by",
-          "type": "integer",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -107,18 +107,18 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "rides_created_by_users_id_fk": {
-          "name": "rides_created_by_users_id_fk",
+        "rides_created_by_users_email_fk": {
+          "name": "rides_created_by_users_email_fk",
           "tableFrom": "rides",
+          "tableTo": "users",
           "columnsFrom": [
             "created_by"
           ],
-          "tableTo": "users",
           "columnsTo": [
-            "id"
+            "email"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -150,20 +150,36 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "stop_location_search_index": {
+          "name": "stop_location_search_index",
+          "columns": [
+            {
+              "expression": "location gin_trgm_ops",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "stops_ride_id_rides_id_fk": {
           "name": "stops_ride_id_rides_id_fk",
           "tableFrom": "stops",
+          "tableTo": "rides",
           "columnsFrom": [
             "ride_id"
           ],
-          "tableTo": "rides",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -184,9 +200,9 @@
       "name": "user_bookmarks",
       "schema": "",
       "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
+        "user_email": {
+          "name": "user_email",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -199,38 +215,38 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "user_bookmarks_user_id_users_id_fk": {
-          "name": "user_bookmarks_user_id_users_id_fk",
+        "user_bookmarks_user_email_users_email_fk": {
+          "name": "user_bookmarks_user_email_users_email_fk",
           "tableFrom": "user_bookmarks",
-          "columnsFrom": [
-            "user_id"
-          ],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
+          "columnsFrom": [
+            "user_email"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "columnsTo": [
+            "email"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "user_bookmarks_ride_id_rides_id_fk": {
           "name": "user_bookmarks_ride_id_rides_id_fk",
           "tableFrom": "user_bookmarks",
+          "tableTo": "rides",
           "columnsFrom": [
             "ride_id"
           ],
-          "tableTo": "rides",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "user_bookmarks_user_id_ride_id_pk": {
-          "name": "user_bookmarks_user_id_ride_id_pk",
+        "user_bookmarks_user_email_ride_id_pk": {
+          "name": "user_bookmarks_user_email_ride_id_pk",
           "columns": [
-            "user_id",
+            "user_email",
             "ride_id"
           ]
         }
@@ -244,9 +260,9 @@
       "name": "user_requests",
       "schema": "",
       "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
+        "user_email": {
+          "name": "user_email",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -255,42 +271,50 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "request_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "user_requests_user_id_users_id_fk": {
-          "name": "user_requests_user_id_users_id_fk",
+        "user_requests_user_email_users_email_fk": {
+          "name": "user_requests_user_email_users_email_fk",
           "tableFrom": "user_requests",
-          "columnsFrom": [
-            "user_id"
-          ],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
+          "columnsFrom": [
+            "user_email"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "columnsTo": [
+            "email"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "user_requests_ride_id_rides_id_fk": {
           "name": "user_requests_ride_id_rides_id_fk",
           "tableFrom": "user_requests",
+          "tableTo": "rides",
           "columnsFrom": [
             "ride_id"
           ],
-          "tableTo": "rides",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "user_requests_user_id_ride_id_pk": {
-          "name": "user_requests_user_id_ride_id_pk",
+        "user_requests_user_email_ride_id_pk": {
+          "name": "user_requests_user_email_ride_id_pk",
           "columns": [
-            "user_id",
+            "user_email",
             "ride_id"
           ]
         }
@@ -304,12 +328,6 @@
       "name": "users",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
         "phone_number": {
           "name": "phone_number",
           "type": "varchar",
@@ -319,8 +337,8 @@
         "email": {
           "name": "email",
           "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
+          "primaryKey": true,
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -332,18 +350,36 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.request_status": {
+      "name": "request_status",
+      "schema": "public",
+      "values": [
+        "accepted",
+        "declined",
+        "pending"
+      ]
+    }
+  },
   "schemas": {},
-  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
+  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

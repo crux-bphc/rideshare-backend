@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752044415499,
-      "tag": "0000_slippery_mastermind",
+      "when": 1752490158807,
+      "tag": "0000_add-extensions",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1752083436927,
-      "tag": "0001_add-extensions",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752083500382,
-      "tag": "0002_common_polaris",
+      "when": 1752493630722,
+      "tag": "0001_init-db",
       "breakpoints": true
     }
   ]

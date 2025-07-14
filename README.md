@@ -49,6 +49,7 @@ Authorization: Bearer <JWT>
 - `GET /ride/request/`: Get all ride requests for the current user
 - `DELETE /ride/request/:rideId`: Cancel a ride request
 - `POST /ride/exit`: Leave a ride
+- `DELETE /ride/manage/remove/:rideId`: Remove a user from a ride
 
 ## Database
 
