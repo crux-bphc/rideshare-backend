@@ -16,7 +16,7 @@ router.get("/", async (_, res) => {
     where: (users, { eq }) => eq(users.email, email),
   });
 
-  // const user = await db.query.users.findMany(); (for testing)
+  // const user = await db.query.users.findMany(); // (for testing)
 
   if (!user) {
     res
@@ -30,16 +30,16 @@ router.get("/", async (_, res) => {
 });
 
 const userSchema = z.looseObject({
-  email: z.email(),
-  phone: z.number(),
+  name: z.string().optional().or(z.literal(undefined)),
+  phone: z.number().gt(Math.pow(10, 9) - 1).lt(Math.pow(10, 10)),
 });
 
 router.post("/", validateRequest(userSchema), async (req, res) => {
-  console.log(req.body);
+  console.log("Request: ", req.body);
 
   const name: string = req.body?.name ?? res.locals.user.name;
   const email: string = res.locals.user.email;
-  // const email: string = req.body.email; (for testing)
+  // const email: string = req.body.email; //(for testing)
   const phoneNumber = req.body.phone;
 
   await db.insert(users).values({
