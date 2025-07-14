@@ -4,7 +4,6 @@ declare global {
   namespace Express {
     interface Locals {
       user: RideShareJWTPayload;
-      userId: number | null;
     }
   }
 }

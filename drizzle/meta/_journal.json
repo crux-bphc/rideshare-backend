@@ -36,6 +36,13 @@
       "when": 1752247899688,
       "tag": "0004_nostalgic_leo",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1752417894907,
+      "tag": "0005_fast_xavin",
+      "breakpoints": true
     }
   ]
 }

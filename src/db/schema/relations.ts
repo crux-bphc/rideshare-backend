@@ -11,7 +11,7 @@ import {
 export const ridesRelations = relations(rides, ({ one, many }) => ({
   user: one(users, {
     fields: [rides.createdBy],
-    references: [users.id],
+    references: [users.email],
   }),
   rideMembers: many(rideMembers),
   userRequests: many(userRequests),
@@ -28,8 +28,8 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const rideMembersRelations = relations(rideMembers, ({ one }) => ({
   user: one(users, {
-    fields: [rideMembers.userId],
-    references: [users.id],
+    fields: [rideMembers.userEmail],
+    references: [users.email],
   }),
   ride: one(rides, {
     fields: [rideMembers.rideId],
@@ -39,8 +39,8 @@ export const rideMembersRelations = relations(rideMembers, ({ one }) => ({
 
 export const userRequestsRelations = relations(userRequests, ({ one }) => ({
   user: one(users, {
-    fields: [userRequests.userId],
-    references: [users.id],
+    fields: [userRequests.userEmail],
+    references: [users.email],
   }),
   ride: one(rides, {
     fields: [userRequests.rideId],
@@ -50,8 +50,8 @@ export const userRequestsRelations = relations(userRequests, ({ one }) => ({
 
 export const userBookmarksRelations = relations(userBookmarks, ({ one }) => ({
   user: one(users, {
-    fields: [userBookmarks.userId],
-    references: [users.id],
+    fields: [userBookmarks.userEmail],
+    references: [users.email],
   }),
   ride: one(rides, {
     fields: [userBookmarks.rideId],

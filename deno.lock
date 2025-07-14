@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/assert@^1.0.13": "1.0.13",
     "jsr:@std/internal@^1.0.6": "1.0.9",
+    "npm:@types/express-serve-static-core@^5.0.7": "5.0.7",
     "npm:@types/express@^5.0.3": "5.0.3",
     "npm:@types/node@*": "22.15.15",
     "npm:drizzle-kit@*": "0.31.4_esbuild@0.25.6",
@@ -13,6 +14,7 @@
     "npm:jose@^6.0.11": "6.0.11",
     "npm:pg@^8.16.3": "8.16.3",
     "npm:postgres@^3.4.7": "3.4.7",
+    "npm:zod-validation-error@^3.5.3": "3.5.3_zod@4.0.5",
     "npm:zod@^4.0.5": "4.0.5"
   },
   "jsr": {
@@ -308,11 +310,20 @@
         "@types/send"
       ]
     },
+    "@types/express-serve-static-core@5.0.7": {
+      "integrity": "sha512-R+33OsgWw7rOhD1emjU7dzCDHucJrgJXMA5PYCzJxVil0dsyx5iBEPHqpPfiKNJQb7lZ1vxwoLR4Z87bBUpeGQ==",
+      "dependencies": [
+        "@types/node",
+        "@types/qs",
+        "@types/range-parser",
+        "@types/send"
+      ]
+    },
     "@types/express@5.0.3": {
       "integrity": "sha512-wGA0NX93b19/dZC1J18tKWVIYWyyF2ZjT9vin/NRu0qzzvfVzWjs04iq2rQ3H65vCTQYlRqs3YHfY7zjdV+9Kw==",
       "dependencies": [
         "@types/body-parser",
-        "@types/express-serve-static-core",
+        "@types/express-serve-static-core@5.0.6",
         "@types/serve-static"
       ]
     },
@@ -929,6 +940,12 @@
     "xtend@4.0.2": {
       "integrity": "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="
     },
+    "zod-validation-error@3.5.3_zod@4.0.5": {
+      "integrity": "sha512-OT5Y8lbUadqVZCsnyFaTQ4/O2mys4tj7PqhdbBCp7McPwvIEKfPtdA6QfPeFQK2/Rz5LgwmAXRJTugBNBi0btw==",
+      "dependencies": [
+        "zod"
+      ]
+    },
     "zod@4.0.5": {
       "integrity": "sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA=="
     }
@@ -1006,6 +1023,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@^1.0.13",
+      "npm:@types/express-serve-static-core@^5.0.7",
       "npm:@types/express@^5.0.3",
       "npm:drizzle-orm@~0.44.2",
       "npm:drizzle-zod@~0.8.2",
@@ -1014,6 +1032,7 @@
       "npm:jose@^6.0.11",
       "npm:pg@^8.16.3",
       "npm:postgres@^3.4.7",
+      "npm:zod-validation-error@^3.5.3",
       "npm:zod@^4.0.5"
     ]
   }

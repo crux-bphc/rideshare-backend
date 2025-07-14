@@ -11,15 +11,14 @@ import {
 import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
   phoneNumber: varchar("phone_number"),
-  email: varchar().unique(),
+  email: varchar().unique().primaryKey(),
   name: varchar(),
 });
 
 export const rides = pgTable("rides", {
   id: serial("id").primaryKey(),
-  createdBy: integer("created_by").notNull().references(() => users.id),
+  createdBy: varchar("created_by").notNull().references(() => users.email),
   comments: varchar(),
   departureStartTime: timestamp("departure_start_time", { mode: "string" }),
   departureEndTime: timestamp("departure_end_time", { mode: "string" }),
@@ -27,11 +26,11 @@ export const rides = pgTable("rides", {
 });
 
 export const rideMembers = pgTable("ride_members", {
-  userId: integer("user_id").notNull().references(() => users.id),
+  userEmail: varchar("user_email").notNull().references(() => users.email),
   rideId: integer("ride_id").notNull().references(() => rides.id),
 }, (table) => [
   primaryKey({
-    columns: [table.userId, table.rideId],
+    columns: [table.userEmail, table.rideId],
   }),
 ]);
 
@@ -42,21 +41,21 @@ export const RequestStatusEnum = pgEnum("request_status", [
 ]);
 
 export const userRequests = pgTable("user_requests", {
-  userId: integer("user_id").notNull().references(() => users.id),
+  userEmail: varchar("user_email").notNull().references(() => users.email),
   rideId: integer("ride_id").notNull().references(() => rides.id),
   status: RequestStatusEnum("status").notNull().default("pending"),
 }, (table) => [
   primaryKey({
-    columns: [table.userId, table.rideId],
+    columns: [table.userEmail, table.rideId],
   }),
 ]);
 
 export const userBookmarks = pgTable("user_bookmarks", {
-  userId: integer("user_id").notNull().references(() => users.id),
+  userEmail: varchar("user_email").notNull().references(() => users.email),
   rideId: integer("ride_id").notNull().references(() => rides.id),
 }, (table) => [
   primaryKey({
-    columns: [table.userId, table.rideId],
+    columns: [table.userEmail, table.rideId],
   }),
 ]);
 
