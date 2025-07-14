@@ -103,14 +103,8 @@ const deleteRide = async (req: Request, res: Response) => {
     );
   }
 
-  await db.transaction(async (tx) => {
-    // Notify ride members, and people who requested the ride that it has been deleted here
-    await tx.delete(rideMembers).where(eq(rideMembers.rideId, rideId));
-    await tx.delete(userRequests).where(eq(userRequests.rideId, rideId));
-    await tx.delete(stops).where(eq(stops.rideId, rideId));
-
-    await tx.delete(rides).where(eq(rides.id, rideId));
-  });
+  // Notify ride members, and people who requested the ride that it has been deleted here
+  await db.delete(rides).where(eq(rides.id, rideId));
 
   res.end();
 };

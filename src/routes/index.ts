@@ -2,7 +2,7 @@ import express from "express";
 import requestRouter from "./rides/request/index.ts";
 import manageRouter from "./rides/manage/index.ts";
 import searchRouter from "./rides/search/index.ts";
-import ridesRouter from "./rides/ride.ts";
+import ridesRouter from "./rides/rides.ts";
 
 const router = express.Router();
 

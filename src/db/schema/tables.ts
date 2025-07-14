@@ -27,7 +27,9 @@ export const rides = pgTable("rides", {
 
 export const rideMembers = pgTable("ride_members", {
   userEmail: varchar("user_email").notNull().references(() => users.email),
-  rideId: integer("ride_id").notNull().references(() => rides.id),
+  rideId: integer("ride_id").notNull().references(() => rides.id, {
+    onDelete: "cascade",
+  }),
 }, (table) => [
   primaryKey({
     columns: [table.userEmail, table.rideId],
@@ -42,7 +44,9 @@ export const RequestStatusEnum = pgEnum("request_status", [
 
 export const userRequests = pgTable("user_requests", {
   userEmail: varchar("user_email").notNull().references(() => users.email),
-  rideId: integer("ride_id").notNull().references(() => rides.id),
+  rideId: integer("ride_id").notNull().references(() => rides.id, {
+    onDelete: "cascade",
+  }),
   status: RequestStatusEnum("status").notNull().default("pending"),
 }, (table) => [
   primaryKey({
@@ -52,7 +56,9 @@ export const userRequests = pgTable("user_requests", {
 
 export const userBookmarks = pgTable("user_bookmarks", {
   userEmail: varchar("user_email").notNull().references(() => users.email),
-  rideId: integer("ride_id").notNull().references(() => rides.id),
+  rideId: integer("ride_id").notNull().references(() => rides.id, {
+    onDelete: "cascade",
+  }),
 }, (table) => [
   primaryKey({
     columns: [table.userEmail, table.rideId],
@@ -60,7 +66,9 @@ export const userBookmarks = pgTable("user_bookmarks", {
 ]);
 
 export const stops = pgTable("stops", {
-  rideId: integer("ride_id").notNull().references(() => rides.id),
+  rideId: integer("ride_id").notNull().references(() => rides.id, {
+    onDelete: "cascade",
+  }),
   location: varchar(),
   order: integer().notNull(),
 }, (table) => [
