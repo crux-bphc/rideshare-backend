@@ -6,13 +6,16 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.13",
     "@types/express": "npm:@types/express@^5.0.3",
+    "@types/express-serve-static-core": "npm:@types/express-serve-static-core@^5.0.7",
     "drizzle-orm": "npm:drizzle-orm@^0.44.2",
     "drizzle-zod": "npm:drizzle-zod@^0.8.2",
+    "http-status-codes": "npm:http-status-codes@^2.3.0",
     "jose": "npm:jose@^6.0.11",
     "pg": "npm:pg@^8.16.3",
     "express": "npm:express@^5.1.0",
     "postgres": "npm:postgres@^3.4.7",
-    "zod": "npm:zod@^3.25.76"
+    "zod": "npm:zod@^4.0.5",
+    "zod-validation-error": "npm:zod-validation-error@^3.5.3"
   },
   "compilerOptions": {
     "types": [
