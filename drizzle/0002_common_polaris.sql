@@ -1,1 +1,0 @@
-CREATE INDEX "stop_location_search_index" ON "stops" USING gin (location gin_trgm_ops);

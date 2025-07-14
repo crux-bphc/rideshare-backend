@@ -5,43 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752044415499,
-      "tag": "0000_slippery_mastermind",
+      "when": 1752490158807,
+      "tag": "0000_add-extensions",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1752083436927,
-      "tag": "0001_add-extensions",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752083500382,
-      "tag": "0002_common_polaris",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752223894276,
-      "tag": "0003_parched_gamma_corps",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1752247899688,
-      "tag": "0004_nostalgic_leo",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1752417894907,
-      "tag": "0005_fast_xavin",
+      "when": 1752490169960,
+      "tag": "0001_amazing_gorilla_man",
       "breakpoints": true
     }
   ]
