@@ -6,7 +6,6 @@ import {
   rideMembers,
   rides,
   stops,
-  userRequests,
 } from "../../db/schema/tables.ts";
 import { eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
