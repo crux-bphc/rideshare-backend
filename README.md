@@ -35,21 +35,26 @@ Authorization: Bearer <JWT>
 
 ### User
 
-- `GET /user`: Get the current user
-- `POST /user`: Create a new user
+| Method | Route   | Description          |
+| ------ | ------- | -------------------- |
+| `GET`  | `/user` | Get the current user |
+| `POST` | `/user` | Create a new user    |
 
 ### Rides
 
-- `POST /ride`: Create a new ride
-- `GET /ride/search`: Search rides
-- `GET /ride/:rideId`: Get a specific ride by ID
-- `DELETE /ride/:rideId`: Delete a ride
-- `POST /ride/manage/:rideId`: Accept/deny ride
-- `POST /ride/request/:rideId`: Create a ride request
-- `GET /ride/request/`: Get all ride requests for the current user
-- `DELETE /ride/request/:rideId`: Cancel a ride request
-- `POST /ride/exit`: Leave a ride
-- `DELETE /ride/manage/remove/:rideId`: Remove a user from a ride
+| Method   | Route                            | Description                           |
+| -------- | -------------------------------- | ------------------------------------- |
+| `GET`    | `/rides/search`                  | Search rides                          |
+| `GET`    | `/rides/:rideId`                 | Get a specific ride by ID             |
+| `POST`   | `/rides`                         | Create a new ride                     |
+| `POST`   | `/rides/manage/requests/:rideId` | Accept/Deny ride request              |
+| `PUT`    | `/rides/manage/update/:rideId`   | Update a ride                         |
+| `DELETE` | `/rides/manage/dismiss/:rideId`  | Remove a user from a ride             |
+| `DELETE` | `/rides/manage/delete/:rideId`   | Delete a ride                         |
+| `GET`    | `/rides/requests`                | Get all requests for the current user |
+| `POST`   | `/rides/request/:rideId`         | Create a ride request                 |
+| `DELETE` | `/rides/request/:rideId`         | Cancel a ride request                 |
+| `POST`   | `/rides/exit/:rideId`            | Leave a ride                          |
 
 ## Database
 
