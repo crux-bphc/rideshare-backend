@@ -1,14 +1,14 @@
 // Accept or reject ride requests
 
 import express, { Request, Response } from "express";
-import { db } from "../../../db/client.ts";
-import { rideMembers, userRequests } from "../../../db/schema/tables.ts";
+import { db } from "../../../../db/client.ts";
+import { rideMembers, userRequests } from "../../../../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
-import { rideIDSchema } from "../index.ts";
-import { asyncHandler } from "../../route_handler.ts";
-import { HttpError } from "../../../utils/http_error.ts";
+import { rideIDSchema } from "../../index.ts";
+import { asyncHandler } from "../../../route_handler.ts";
+import { HttpError } from "../../../../utils/http_error.ts";
 
 const router = express.Router();
 
@@ -38,7 +38,8 @@ const manage = async (req: Request, res: Response) => {
 
   // Check if the given user id is in the ride requests
   const requestUser = await db.query.userRequests.findFirst({
-    where: (user, { eq, and }) => and(eq(user.userEmail, requestUserEmail), eq(user.rideId, rideId)),
+    where: (user, { eq, and }) =>
+      and(eq(user.userEmail, requestUserEmail), eq(user.rideId, rideId)),
   });
 
   if (!requestUser) {
