@@ -4,7 +4,7 @@ import manageRouter from "./rides/manage/index.ts";
 import searchRouter from "./rides/search/index.ts";
 import ridesRouter from "./rides/rides.ts";
 
-import userRouter from "./user/user.ts";
+import userRouter from "./user/index.ts";
 
 const router = express.Router();
 
