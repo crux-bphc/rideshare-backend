@@ -1,6 +1,14 @@
 import z from "zod";
 import { StatusCodes } from "http-status-codes";
 import { HttpError } from "../../utils/http_error.ts";
+import request from "./request/index.ts";
+import search from "./search/index.ts";
+import rides from "./rides.ts";
+import exit from "./exit/index.ts";
+import deleteRide from "./manage/delete/index.ts";
+import dismiss from "./manage/dismiss/index.ts";
+import update from "./manage/update/index.ts";
+import manageRequest from "./manage/requests/index.ts";
 
 export const rideIDSchema = z.object({ rideId: z.coerce.number().int() });
 export const ISODateString = z.string().refine(
@@ -25,4 +33,15 @@ export const checkTimes = (
       "Invalid departure start and / or end time!",
     );
   }
+};
+
+export {
+  deleteRide,
+  dismiss,
+  exit,
+  manageRequest,
+  request,
+  rides,
+  search,
+  update,
 };
