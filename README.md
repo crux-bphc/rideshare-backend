@@ -54,7 +54,7 @@ Authorization: Bearer <JWT>
 | `GET`    | `/rides/requests`                | Get all requests for the current user |
 | `POST`   | `/rides/request/:rideId`         | Create a ride request                 |
 | `DELETE` | `/rides/request/:rideId`         | Cancel a ride request                 |
-| `POST`   | `/rides/exit/:rideId`            | Leave a ride                          |
+| `DELETE` | `/rides/exit/:rideId`            | Leave a ride                          |
 
 ## Database
 
