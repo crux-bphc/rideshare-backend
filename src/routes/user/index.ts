@@ -26,8 +26,10 @@ const get_user = async (_: Request, res: Response) => {
   //   const user = await db.query.users.findMany(); // (for testing)
 
   if (!user) {
-    throw HttpError;
+    throw new HttpError(404, "User Not Found");
   }
+
+  res.json(user);
 };
 
 router.get("/", asyncHandler(get_user));
@@ -36,7 +38,7 @@ const post_user = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const userDetails = z.parse(userSchema, req.params);
+  const userDetails = userSchema.parse(req.body);
 
   const name: string = userDetails?.name ?? res.locals.user.name;
   const phoneNumber: string = userDetails.phone;
@@ -46,6 +48,8 @@ const post_user = async (req: Request, res: Response) => {
     email,
     name,
   });
+
+  res.json(201).json({ message: "User created successfully" });
 };
 
 router.post("/", asyncHandler(post_user));
