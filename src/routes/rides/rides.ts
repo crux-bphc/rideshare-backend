@@ -31,7 +31,7 @@ const createRide = async (req: Request, res: Response) => {
     rideStops,
   } = z.parse(rideCreateSchema, req.body);
 
-  checkTimes(departureStartTime, departureEndTime);
+  checkTimes(departureStartTime, departureEndTime, true);
 
   await db.transaction(async (tx) => {
     const rideId = (await tx.insert(rides).values({

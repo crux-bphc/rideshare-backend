@@ -63,6 +63,7 @@ const update = async (req: Request, res: Response) => {
   checkTimes(
     departureStartTime ?? ride.departureStartTime!,
     departureEndTime ?? ride.departureEndTime!,
+    false,
   );
 
   // Check if member count is more than max member count
