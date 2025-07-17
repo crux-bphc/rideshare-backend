@@ -7,12 +7,9 @@ import { StatusCodes } from "http-status-codes";
 import z from "zod";
 import { asyncHandler } from "../route_handler.ts";
 import { HttpError } from "../../utils/http_error.ts";
+import { checkTimes, ISODateString } from "./index.ts";
 
 const router = express.Router();
-
-const ISODateString = z.string().refine((str) => !isNaN(Date.parse(str)), {
-  message: "Invalid date provided! Expected an ISO date string.",
-});
 
 const rideCreateSchema = z.object({
   departureStartTime: ISODateString,
@@ -34,17 +31,7 @@ const createRide = async (req: Request, res: Response) => {
     rideStops,
   } = z.parse(rideCreateSchema, req.body);
 
-  const start = (new Date(departureStartTime)).getTime(),
-    end = (new Date(departureEndTime)).getTime(),
-    now = Date.now();
-
-  // Don't create rides that run before creation time
-  if (start < now || end < now || end < start) {
-    throw new HttpError(
-      StatusCodes.BAD_REQUEST,
-      "Invalid departure start and / or end time!",
-    );
-  }
+  checkTimes(departureStartTime, departureEndTime, true);
 
   await db.transaction(async (tx) => {
     const rideId = (await tx.insert(rides).values({

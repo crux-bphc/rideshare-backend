@@ -58,7 +58,7 @@ const manage = async (req: Request, res: Response) => {
   });
 
   // Check if ride members can allow another member into the ride
-  if (members.length >= (ride?.maxMemberCount ?? 0)) {
+  if (members.length >= (ride.maxMemberCount ?? 0)) {
     throw new HttpError(
       StatusCodes.SERVICE_UNAVAILABLE,
       "This ride is already full! This request cannot be accepted unless you change the max member count or remove someone from your ride.",
