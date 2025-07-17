@@ -8,7 +8,7 @@ import { checkTimes, ISODateString, rideIDSchema } from "../../index.ts";
 import { asyncHandler } from "../../../route_handler.ts";
 import { HttpError } from "../../../../utils/http_error.ts";
 import { rides, stops } from "../../../../db/schema/tables.ts";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const router = express.Router();
 
@@ -83,11 +83,17 @@ const update = async (req: Request, res: Response) => {
   await db.transaction(async (tx) => {
     // Update stops
     if (rideStops) {
-      for (const [index, stop] of rideStops.entries()) {
-        await tx.update(stops).set({ location: stop }).where(
-          and(eq(stops.rideId, rideId), eq(stops.order, index + 1)),
-        );
-      }
+      // Remove all stops related to the ride
+      await tx.delete(stops).where(eq(stops.rideId, rideId));
+
+      // Add new, updated stops
+      await tx.insert(stops).values(rideStops.map((value, index) => {
+        return {
+          order: index + 1,
+          rideId,
+          location: value,
+        };
+      }));
     }
 
     // Not sending any value will not update the field
