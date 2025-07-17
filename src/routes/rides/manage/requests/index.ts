@@ -28,8 +28,12 @@ const manage = async (req: Request, res: Response) => {
     where: (rides, { eq }) => eq(rides.id, rideId),
   });
 
+  if (!ride) {
+    throw new HttpError(StatusCodes.NOT_FOUND, "The given ride was not found!");
+  }
+
   // Check if the ride actually belongs to the user
-  if ((ride?.createdBy ?? -1) !== email) {
+  if (ride.createdBy !== email) {
     throw new HttpError(
       StatusCodes.UNAUTHORIZED,
       "The current user cannot change the given ride data! User is not the owner of the ride.",

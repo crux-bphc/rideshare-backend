@@ -1,6 +1,7 @@
 import express from "express";
 import requestRouter from "./rides/request/index.ts";
 import deleteRouter from "./rides/manage/delete/index.ts";
+import dismissRouter from "./rides/manage/dismiss/index.ts";
 import requestManageRouter from "./rides/manage/requests/index.ts";
 import searchRouter from "./rides/search/index.ts";
 import ridesRouter from "./rides/rides.ts";
@@ -12,5 +13,6 @@ router.use("/rides/search", searchRouter);
 router.use("/rides/request", requestRouter);
 router.use("/rides/manage/requests", requestManageRouter);
 router.use("/rides/manage/delete", deleteRouter);
+router.use("/rides/manage/dismiss", dismissRouter);
 
 export default router;

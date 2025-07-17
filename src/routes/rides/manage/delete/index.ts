@@ -27,7 +27,7 @@ const deleteRide = async (req: Request, res: Response) => {
   }
 
   // Check if the ride actually belongs to the user
-  if ((ride?.createdBy ?? -1) !== email) {
+  if (ride.createdBy !== email) {
     throw new HttpError(
       StatusCodes.UNAUTHORIZED,
       "The current user cannot delete the ride! User is not the owner of the ride.",
