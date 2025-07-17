@@ -1,4 +1,4 @@
-// Accept or reject ride requests
+// Kick user out of a ride
 
 import express, { Request, Response } from "express";
 import { db } from "../../../../db/client.ts";
