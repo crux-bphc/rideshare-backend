@@ -1,14 +1,14 @@
 // Accept or reject ride requests
 
 import express, { Request, Response } from "express";
-import { db } from "../../../db/client.ts";
-import { rideMembers, userRequests } from "../../../db/schema/tables.ts";
+import { db } from "../../../../db/client.ts";
+import { rideMembers, userRequests } from "../../../../db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
-import { rideIDSchema } from "../index.ts";
-import { asyncHandler } from "../../route_handler.ts";
-import { HttpError } from "../../../utils/http_error.ts";
+import { rideIDSchema } from "../../index.ts";
+import { asyncHandler } from "../../../route_handler.ts";
+import { HttpError } from "../../../../utils/http_error.ts";
 
 const router = express.Router();
 
@@ -28,8 +28,12 @@ const manage = async (req: Request, res: Response) => {
     where: (rides, { eq }) => eq(rides.id, rideId),
   });
 
+  if (!ride) {
+    throw new HttpError(StatusCodes.NOT_FOUND, "The given ride was not found!");
+  }
+
   // Check if the ride actually belongs to the user
-  if ((ride?.createdBy ?? -1) !== email) {
+  if (ride.createdBy !== email) {
     throw new HttpError(
       StatusCodes.UNAUTHORIZED,
       "The current user cannot change the given ride data! User is not the owner of the ride.",
@@ -38,7 +42,8 @@ const manage = async (req: Request, res: Response) => {
 
   // Check if the given user id is in the ride requests
   const requestUser = await db.query.userRequests.findFirst({
-    where: (user, { eq, and }) => and(eq(user.userEmail, requestUserEmail), eq(user.rideId, rideId)),
+    where: (user, { eq, and }) =>
+      and(eq(user.userEmail, requestUserEmail), eq(user.rideId, rideId)),
   });
 
   if (!requestUser) {
@@ -53,7 +58,7 @@ const manage = async (req: Request, res: Response) => {
   });
 
   // Check if ride members can allow another member into the ride
-  if (members.length >= (ride?.maxMemberCount ?? 0)) {
+  if (members.length >= (ride.maxMemberCount ?? 0)) {
     throw new HttpError(
       StatusCodes.SERVICE_UNAVAILABLE,
       "This ride is already full! This request cannot be accepted unless you change the max member count or remove someone from your ride.",
