@@ -15,8 +15,8 @@ app.get("/", (_, res) => {
   res.send("Hello, World!");
 });
 
-app.use(dummyLogtoMiddleware);
-// app.use(logtoMiddleware);
+// app.use(dummyLogtoMiddleware);
+app.use(logtoMiddleware);
 app.use(routes);
 
 export default app;
