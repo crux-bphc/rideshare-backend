@@ -1,27 +1,25 @@
 // Kick user out of a ride
 
 import express, { Request, Response } from "express";
-import { db } from "../../../../db/client.ts";
-import { rideMembers, userRequests } from "../../../../db/schema/tables.ts";
+import { db } from "@/db/client.ts";
+import { rideMembers, userRequests } from "@/db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
-import z from "zod";
-import { rideIDSchema } from "../../index.ts";
-import { asyncHandler } from "../../../route_handler.ts";
-import { HttpError } from "../../../../utils/http_error.ts";
+import {
+  rideDismissSchema,
+  rideIDSchema,
+} from "@/validators/ride_validators.ts";
+import { asyncHandler } from "@/routes/route_handler.ts";
+import { HttpError } from "@/utils/http_error.ts";
 
 const router = express.Router();
-
-const dismissSchema = z.object({
-  dismissUserEmail: z.string(),
-});
 
 const dismiss = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const { rideId } = z.parse(rideIDSchema, req.params);
-  const { dismissUserEmail } = z.parse(dismissSchema, req.body);
+  const { rideId } = rideIDSchema.parse(req.params);
+  const { dismissUserEmail } = rideDismissSchema.parse(req.body);
 
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
@@ -61,7 +59,7 @@ const dismiss = async (req: Request, res: Response) => {
         "The given member was not found!",
       );
     }
-    
+
     // Remove request
     await tx.delete(userRequests).where(
       and(

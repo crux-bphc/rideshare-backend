@@ -1,16 +1,9 @@
-import { z } from "zod";
 import express, { Request, Response } from "express";
-import { db } from "../../db/client.ts";
-import { users } from "../../db/schema/tables.ts";
+import { db } from "@/db/client.ts";
+import { users } from "@/db/schema/tables.ts";
 import { asyncHandler } from "../route_handler.ts";
-import { HttpError } from "../../utils/http_error.ts";
-
-const userSchema = z.object({
-  name: z.string().optional().or(z.literal(undefined)),
-  phone: z.string().length(10, "Phone number must be of length 10").regex(
-    /^\d+$/,
-  ),
-});
+import { HttpError } from "@/utils/http_error.ts";
+import { userSchema } from "@/validators/user_validator.ts";
 
 const router = express.Router();
 

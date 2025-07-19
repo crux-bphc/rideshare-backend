@@ -1,6 +1,6 @@
 import express from "express";
 import routes from "./routes/index.ts";
-import { logtoMiddleware } from "./middleware/logto.ts";
+import { dummyLogtoMiddleware, logtoMiddleware } from "./middleware/logto.ts";
 
 const app = express();
 app.use(express.json());
@@ -15,7 +15,8 @@ app.get("/", (_, res) => {
   res.send("Hello, World!");
 });
 
-app.use(logtoMiddleware);
+app.use(dummyLogtoMiddleware);
+// app.use(logtoMiddleware);
 app.use(routes);
 
 export default app;

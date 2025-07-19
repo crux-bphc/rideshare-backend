@@ -4,3 +4,4 @@ drizzle-cli
 !.env.example
 node_modules
 test.*
+testing
