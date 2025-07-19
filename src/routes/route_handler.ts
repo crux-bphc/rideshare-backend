@@ -1,7 +1,7 @@
 import type express from "express";
 import { StatusCodes } from "http-status-codes";
 import type core from "express-serve-static-core";
-import { HttpError } from "../utils/http_error.ts";
+import { HttpError } from "@/utils/http_error.ts";
 import { fromError, isZodErrorLike } from "zod-validation-error/v4";
 
 export const asyncHandler = <

@@ -1,14 +1,13 @@
 // Delete rides
 
 import express, { Request, Response } from "express";
-import { db } from "../../../../db/client.ts";
-import { rides } from "../../../../db/schema/tables.ts";
+import { db } from "@/db/client.ts";
+import { rides } from "@/db/schema/tables.ts";
 import { eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
-import z from "zod";
-import { asyncHandler } from "../../../route_handler.ts";
-import { HttpError } from "../../../../utils/http_error.ts";
-import { rideIDSchema } from "../../index.ts";
+import { asyncHandler } from "@/routes/route_handler.ts";
+import { HttpError } from "@/utils/http_error.ts";
+import { rideIDSchema } from "@/validators/ride_validators.ts";
 
 const router = express.Router();
 
@@ -16,7 +15,7 @@ const deleteRide = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const { rideId } = z.parse(rideIDSchema, req.params);
+  const { rideId } = rideIDSchema.parse(req.params);
 
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),

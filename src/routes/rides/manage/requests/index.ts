@@ -1,28 +1,25 @@
 // Accept or reject ride requests
 
 import express, { Request, Response } from "express";
-import { db } from "../../../../db/client.ts";
-import { rideMembers, userRequests } from "../../../../db/schema/tables.ts";
+import { db } from "@/db/client.ts";
+import { rideMembers, userRequests } from "@/db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
-import z from "zod";
-import { rideIDSchema } from "../../index.ts";
-import { asyncHandler } from "../../../route_handler.ts";
-import { HttpError } from "../../../../utils/http_error.ts";
+import {
+  rideIDSchema,
+  rideManageSchema,
+} from "@/validators/ride_validators.ts";
+import { asyncHandler } from "@/routes/route_handler.ts";
+import { HttpError } from "@/utils/http_error.ts";
 
 const router = express.Router();
-
-const manageSchema = z.object({
-  requestUserEmail: z.string(),
-  status: z.enum(["accepted", "declined"]),
-});
 
 const manage = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const { rideId } = z.parse(rideIDSchema, req.params);
-  const { requestUserEmail, status } = z.parse(manageSchema, req.body);
+  const { rideId } = rideIDSchema.parse(req.params);
+  const { requestUserEmail, status } = rideManageSchema.parse(req.body);
 
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
