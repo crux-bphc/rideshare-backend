@@ -24,8 +24,8 @@ const createRide = async (req: Request, res: Response) => {
   await db.transaction(async (tx) => {
     const rideId = (await tx.insert(rides).values({
       createdBy: email,
-      departureEndTime,
-      departureStartTime,
+      departureEndTime: new Date(departureEndTime),
+      departureStartTime: new Date(departureStartTime),
       comments,
       maxMemberCount,
     }).returning())[0].id;

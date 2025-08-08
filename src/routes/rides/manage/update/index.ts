@@ -56,8 +56,8 @@ const update = async (req: Request, res: Response) => {
 
   // If the time has been updated, check it to make sure the new start time and end times are not reversed
   checkTimes(
-    departureStartTime ?? ride.departureStartTime!,
-    departureEndTime ?? ride.departureEndTime!,
+    departureStartTime ?? ride.departureStartTime!.toISOString(),
+    departureEndTime ?? ride.departureEndTime!.toISOString(),
     false,
   );
 
@@ -93,8 +93,12 @@ const update = async (req: Request, res: Response) => {
 
     // Not sending any value will not update the field
     await tx.update(rides).set({
-      departureEndTime,
-      departureStartTime,
+      departureEndTime: departureEndTime
+        ? new Date(departureEndTime)
+        : undefined,
+      departureStartTime: departureStartTime
+        ? new Date(departureStartTime)
+        : undefined,
       comments,
       maxMemberCount,
     }).where(
