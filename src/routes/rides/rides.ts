@@ -3,10 +3,8 @@
 import express, { Request, Response } from "express";
 import { db } from "../../db/client.ts";
 import { rideMembers, rides, stops } from "../../db/schema/tables.ts";
-import { StatusCodes } from "http-status-codes";
 import z from "zod";
 import { asyncHandler } from "../route_handler.ts";
-import { HttpError } from "../../utils/http_error.ts";
 import { checkTimes, ISODateString } from "./index.ts";
 
 const router = express.Router();
