@@ -3,7 +3,6 @@ import routes from "./routes/index.ts";
 import { logtoMiddleware } from "./middleware/logto.ts";
 
 const app = express();
-
 app.use(express.json());
 
 // log requests
@@ -17,7 +16,6 @@ app.get("/", (_, res) => {
 });
 
 app.use(logtoMiddleware);
-
 app.use(routes);
 
 export default app;

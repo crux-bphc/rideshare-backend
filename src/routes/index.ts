@@ -9,8 +9,11 @@ import {
   search,
   update,
 } from "./rides/exports.ts";
+import userRouter from "./user/index.ts";
 
 const router = express.Router();
+
+router.use("/user", userRouter);
 
 router.use("/rides", rides);
 router.use("/rides/search", search);
