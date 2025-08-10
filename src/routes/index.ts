@@ -8,7 +8,7 @@ import {
   rides,
   search,
   update,
-} from "./rides/index.ts";
+} from "./rides/exports.ts";
 
 const router = express.Router();
 
