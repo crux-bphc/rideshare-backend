@@ -51,18 +51,3 @@ export const logtoMiddleware: RequestHandler = async (req, res, next) => {
 
   next();
 };
-
-export const dummyLogtoMiddleware: RequestHandler = (req, res, next) => {
-  res.locals.user = {
-    sub: "user_123456",
-    aud: "dummy-client-id",
-    email: "testuser@example.com",
-    name: "Test User",
-    picture: "https://example.com/avatar.jpg",
-    updated_at: Date.now(),
-    username: "testuser",
-    email_verified: true,
-    created_at: Date.now(),
-  };
-  next();
-};

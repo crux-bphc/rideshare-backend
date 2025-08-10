@@ -45,7 +45,7 @@ export const rideTimeSearchSchema = z.object({
   from: ISODateString.optional(),
   by: ISODateString.optional(),
 }).refine((query) => {
-  return !!query.by !== !!query.from;
+  return (query.by && !query.from) || (!query.by && query.from);
 });
 
 export const rideManageSchema = z.object({

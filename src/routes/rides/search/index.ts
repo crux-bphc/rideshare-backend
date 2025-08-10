@@ -2,7 +2,6 @@
 import express, { Request, Response } from "express";
 import { db } from "@/db/client.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
-import { getItems } from "@/utils/db_search.ts";
 import { rides, stops } from "@/db/schema/tables.ts";
 import {
   rideLocationSearchSchema,
@@ -29,7 +28,6 @@ const search_location = async (req: Request, res: Response) => {
     gt(similarity, 0),
   ).orderBy(desc(similarity)).limit(4);
 
-  // const found_rides = await db.select().from(rides);
   res.json(found_rides);
 };
 
