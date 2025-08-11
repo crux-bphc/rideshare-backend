@@ -1,23 +1,11 @@
 // Create rides
-
 import express, { Request, Response } from "express";
-import { db } from "../../db/client.ts";
-import { rideMembers, rides, stops } from "../../db/schema/tables.ts";
-import { StatusCodes } from "http-status-codes";
-import z from "zod";
+import { db } from "@/db/client.ts";
+import { rideMembers, rides, stops } from "@/db/schema/tables.ts";
 import { asyncHandler } from "../route_handler.ts";
-import { HttpError } from "../../utils/http_error.ts";
-import { checkTimes, ISODateString } from "./index.ts";
+import { checkTimes, rideCreateSchema } from "@/validators/ride_validators.ts";
 
 const router = express.Router();
-
-const rideCreateSchema = z.object({
-  departureStartTime: ISODateString,
-  departureEndTime: ISODateString,
-  comments: z.string().nullable(),
-  maxMemberCount: z.int().min(1), // Must have space for at least the owner
-  rideStops: z.array(z.string()).min(2), // Must have start and end location
-});
 
 const createRide = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
@@ -29,15 +17,15 @@ const createRide = async (req: Request, res: Response) => {
     comments = "",
     maxMemberCount,
     rideStops,
-  } = z.parse(rideCreateSchema, req.body);
+  } = rideCreateSchema.parse(req.body);
 
   checkTimes(departureStartTime, departureEndTime, true);
 
   await db.transaction(async (tx) => {
     const rideId = (await tx.insert(rides).values({
       createdBy: email,
-      departureEndTime,
-      departureStartTime,
+      departureEndTime: new Date(departureEndTime),
+      departureStartTime: new Date(departureStartTime),
       comments,
       maxMemberCount,
     }).returning())[0].id;

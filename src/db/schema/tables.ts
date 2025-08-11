@@ -20,8 +20,8 @@ export const rides = pgTable("rides", {
   id: serial("id").primaryKey(),
   createdBy: varchar("created_by").notNull().references(() => users.email),
   comments: varchar(),
-  departureStartTime: timestamp("departure_start_time", { mode: "string" }),
-  departureEndTime: timestamp("departure_end_time", { mode: "string" }),
+  departureStartTime: timestamp("departure_start_time", { mode: "date" }),
+  departureEndTime: timestamp("departure_end_time", { mode: "date" }),
   maxMemberCount: integer("max_member_count"),
 });
 

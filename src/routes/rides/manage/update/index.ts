@@ -1,32 +1,27 @@
 // Update ride data
 
 import express, { Request, Response } from "express";
-import { db } from "../../../../db/client.ts";
+import { db } from "@/db/client.ts";
 import { StatusCodes } from "http-status-codes";
-import z from "zod";
-import { checkTimes, ISODateString, rideIDSchema } from "../../index.ts";
-import { asyncHandler } from "../../../route_handler.ts";
-import { HttpError } from "../../../../utils/http_error.ts";
-import { rides, stops } from "../../../../db/schema/tables.ts";
+import {
+  checkTimes,
+  rideIDSchema,
+  rideUpdateSchema,
+} from "@/validators/ride_validators.ts";
+import { asyncHandler } from "@/routes/route_handler.ts";
+import { HttpError } from "@/utils/http_error.ts";
+import { rides, stops } from "@/db/schema/tables.ts";
 import { eq } from "drizzle-orm";
 
 const router = express.Router();
-
-const rideUpdateSchema = z.object({
-  departureStartTime: ISODateString.optional(),
-  departureEndTime: ISODateString.optional(),
-  comments: z.string().nullable().optional(),
-  maxMemberCount: z.int().min(1).optional(), // Must have space for at least the owner
-  rideStops: z.array(z.string()).min(2).optional(), // Must have start and end location - the whole set of stops must be sent
-});
 
 const update = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const { rideId } = z.parse(rideIDSchema, req.params);
+  const { rideId } = rideIDSchema.parse(req.params);
 
-  const rideUpdateDetails = z.parse(rideUpdateSchema, req.body);
+  const rideUpdateDetails = rideUpdateSchema.parse(req.body);
 
   if (Object.keys(rideUpdateDetails).length === 0) {
     throw new HttpError(
@@ -61,8 +56,8 @@ const update = async (req: Request, res: Response) => {
 
   // If the time has been updated, check it to make sure the new start time and end times are not reversed
   checkTimes(
-    departureStartTime ?? ride.departureStartTime!,
-    departureEndTime ?? ride.departureEndTime!,
+    departureStartTime ?? ride.departureStartTime!.toISOString(),
+    departureEndTime ?? ride.departureEndTime!.toISOString(),
     false,
   );
 
@@ -98,8 +93,12 @@ const update = async (req: Request, res: Response) => {
 
     // Not sending any value will not update the field
     await tx.update(rides).set({
-      departureEndTime,
-      departureStartTime,
+      departureEndTime: departureEndTime
+        ? new Date(departureEndTime)
+        : undefined,
+      departureStartTime: departureStartTime
+        ? new Date(departureStartTime)
+        : undefined,
       comments,
       maxMemberCount,
     }).where(

@@ -1,14 +1,13 @@
 // Create or remove ride requests
 
 import express, { Request, Response } from "express";
-import { db } from "../../../db/client.ts";
-import { userRequests } from "../../../db/schema/tables.ts";
+import { db } from "@/db/client.ts";
+import { userRequests } from "@/db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
-import { asyncHandler } from "../../route_handler.ts";
-import { HttpError } from "../../../utils/http_error.ts";
-import { rideIDSchema } from "../index.ts";
-import z from "zod";
+import { asyncHandler } from "@/routes/route_handler.ts";
+import { HttpError } from "@/utils/http_error.ts";
+import { rideIDSchema } from "@/validators/ride_validators.ts";
 
 const router = express.Router();
 
@@ -16,7 +15,7 @@ const request = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const { rideId } = z.parse(rideIDSchema, req.params);
+  const { rideId } = rideIDSchema.parse(req.params);
 
   // Check if ride members can allow another member into the ride
   const ride = await db.query.rides.findFirst({
@@ -80,7 +79,7 @@ const deleteRequest = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
-  const { rideId } = z.parse(rideIDSchema, req.params);
+  const { rideId } = rideIDSchema.parse(req.params);
 
   const request = await db.query.userRequests.findFirst({
     where: (request, { eq, and }) =>
