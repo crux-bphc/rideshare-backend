@@ -1,5 +1,5 @@
 {
-  "id": "23d1512d-9712-4061-9ac6-8e19821beb63",
+  "id": "179b99b8-dc0b-4ba3-9ab3-e6bb159bbf9c",
   "prevId": "6295ee0a-5227-42d6-9e7f-52666ad7e792",
   "version": "7",
   "dialect": "postgresql",
@@ -103,9 +103,37 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "ride_start_location": {
+          "name": "ride_start_location",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ride_end_location": {
+          "name": "ride_end_location",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "start_location_search_index": {
+          "name": "start_location_search_index",
+          "columns": [
+            {
+              "expression": "ride_start_location gin_trgm_ops, ride_end_location gin_trgm_ops",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "rides_created_by_users_email_fk": {
           "name": "rides_created_by_users_email_fk",
@@ -122,75 +150,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.stops": {
-      "name": "stops",
-      "schema": "",
-      "columns": {
-        "ride_id": {
-          "name": "ride_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "location": {
-          "name": "location",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "order": {
-          "name": "order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "stop_location_search_index": {
-          "name": "stop_location_search_index",
-          "columns": [
-            {
-              "expression": "location gin_trgm_ops",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "stops_ride_id_rides_id_fk": {
-          "name": "stops_ride_id_rides_id_fk",
-          "tableFrom": "stops",
-          "tableTo": "rides",
-          "columnsFrom": [
-            "ride_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "stops_ride_id_order_pk": {
-          "name": "stops_ride_id_order_pk",
-          "columns": [
-            "ride_id",
-            "order"
-          ]
-        }
-      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

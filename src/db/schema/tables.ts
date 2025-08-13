@@ -23,7 +23,14 @@ export const rides = pgTable("rides", {
   departureStartTime: timestamp("departure_start_time", { mode: "date" }),
   departureEndTime: timestamp("departure_end_time", { mode: "date" }),
   maxMemberCount: integer("max_member_count"),
-});
+  ride_start_location: varchar().notNull(),
+  ride_end_location: varchar().notNull(),
+}, (table) => [
+  index("start_location_search_index").using(
+    "gin",
+    sql`ride_start_location gin_trgm_ops, ride_end_location gin_trgm_ops`,
+  ),
+]);
 
 export const rideMembers = pgTable("ride_members", {
   userEmail: varchar("user_email").notNull().references(() => users.email),
@@ -63,15 +70,4 @@ export const userBookmarks = pgTable("user_bookmarks", {
   primaryKey({
     columns: [table.userEmail, table.rideId],
   }),
-]);
-
-export const stops = pgTable("stops", {
-  rideId: integer("ride_id").notNull().references(() => rides.id, {
-    onDelete: "cascade",
-  }),
-  location: varchar(),
-  order: integer().notNull(),
-}, (table) => [
-  primaryKey({ columns: [table.rideId, table.order] }),
-  index("stop_location_search_index").using("gin", sql`location gin_trgm_ops`),
 ]);
