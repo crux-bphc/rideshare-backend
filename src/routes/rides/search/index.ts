@@ -13,7 +13,9 @@ import { HttpError } from "../../../utils/http_error.ts";
 const router = express.Router();
 
 const search_location = async (req: Request, res: Response) => {
-  const { search_query } = rideLocationSearchSchema.parse(req.query);
+  const { search_location: search_query } = rideLocationSearchSchema.parse(
+    req.query,
+  );
 
   const similarityStart = sql<
     number

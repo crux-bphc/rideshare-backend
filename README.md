@@ -24,38 +24,6 @@ docker compose --profile dev up --build --watch
 docker compose exec web-dev deno run db migrate
 ```
 
-## API Endpoints
-
-All requests to the following endpoints should include a valid JWT in the
-`Authorization` header.
-
-```
-Authorization: Bearer <JWT>
-```
-
-### User
-
-| Method | Route   | Description          |
-| ------ | ------- | -------------------- |
-| `GET`  | `/user` | Get the current user |
-| `POST` | `/user` | Create a new user    |
-
-### Rides
-
-| Method   | Route                            | Description                           |
-| -------- | -------------------------------- | ------------------------------------- |
-| `GET`    | `/rides/search`                  | Search rides                          |
-| `GET`    | `/rides/:rideId`                 | Get a specific ride by ID             |
-| `POST`   | `/rides`                         | Create a new ride                     |
-| `POST`   | `/rides/manage/requests/:rideId` | Accept/Deny ride request              |
-| `PUT`    | `/rides/manage/update/:rideId`   | Update a ride                         |
-| `DELETE` | `/rides/manage/dismiss/:rideId`  | Remove a user from a ride             |
-| `DELETE` | `/rides/manage/delete/:rideId`   | Delete a ride                         |
-| `GET`    | `/rides/requests`                | Get all requests for the current user |
-| `POST`   | `/rides/request/:rideId`         | Create a ride request                 |
-| `DELETE` | `/rides/request/:rideId`         | Cancel a ride request                 |
-| `DELETE` | `/rides/exit/:rideId`            | Leave a ride                          |
-
 ## Database
 
 The schema is located in `src/db/schema/tables.ts`. The database is managed

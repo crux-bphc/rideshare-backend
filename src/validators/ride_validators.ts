@@ -41,7 +41,9 @@ export const rideDismissSchema = z.object({
   dismissUserEmail: z.string(),
 });
 
-export const rideLocationSearchSchema = z.object({ search_query: z.string() });
+export const rideLocationSearchSchema = z.object({
+  search_location: z.string(),
+});
 export const rideTimeSearchSchema = z.object({
   from: ISODateString.optional(),
   by: ISODateString.optional(),
@@ -49,7 +51,7 @@ export const rideTimeSearchSchema = z.object({
   return (query.by && !query.from) || (!query.by && query.from);
 });
 
-export const rideManageSchema = z.object({
+export const rideRequestManageSchema = z.object({
   requestUserEmail: z.string(),
   status: z.enum(["accepted", "declined"]),
 });

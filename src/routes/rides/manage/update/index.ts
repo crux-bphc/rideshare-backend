@@ -88,7 +88,6 @@ const update = async (req: Request, res: Response) => {
       );
     }
 
-    if (!(departureStartTime || departureEndTime)) return;
     // Not sending any value will not update the field
     await tx.update(rides).set({
       departureEndTime: departureEndTime
