@@ -114,8 +114,8 @@ Retrieves a ride based on rideId param.
   id: number;
   createdBy: string;
   comments: string | null;
-  departureStartTime: Date;
-  departureEndTime: Date;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
   maxMemberCount: int;
   ride_start_location: string;
   ride_end_location: string;
