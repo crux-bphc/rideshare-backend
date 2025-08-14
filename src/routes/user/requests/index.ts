@@ -13,12 +13,12 @@ const requestSent = async (req: Request, res: Response) => {
     where: (requests, { eq }) => eq(requests.userEmail, email),
   });
 
-  if (!user_reqs) throw new HttpError(404, "No requests found");
+  if (!user_reqs.length) throw new HttpError(404, "No requests found");
 
   res.json(user_reqs);
 };
 
-const requestRecieved = async (req: Request, res: Response) => {
+const requestReceived = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) return;
 
@@ -28,21 +28,17 @@ const requestRecieved = async (req: Request, res: Response) => {
 
   if (!user_rides) throw new HttpError(404, "User has no rides to request.");
 
-  var user_requests: {
-    rideId: number;
-    status: "accepted" | "declined" | "pending";
-    userEmail: string;
-  }[] = [];
-
-  user_rides.map(async (ride) => {
-    const ride_requests = await db.query.userRequests.findMany({
-      where: (requests, { eq }) => eq(requests.rideId, ride.id),
-    });
-
-    if (!ride_requests) return;
-
-    user_requests.push(...ride_requests);
-  });
+  // Collect all ride requests for each ride
+  const rideRequestsArrays = await Promise.all(
+    user_rides.map(async (ride) => {
+      const ride_requests = await db.query.userRequests.findMany({
+        where: (requests, { eq }) => eq(requests.rideId, ride.id),
+      });
+      return ride_requests || [];
+    }),
+  );
+  // Flatten the array of arrays into a single array
+  const user_requests = rideRequestsArrays.flat();
 
   if (!user_requests.length) throw new HttpError(404, "User has no requests");
 
@@ -50,6 +46,6 @@ const requestRecieved = async (req: Request, res: Response) => {
 };
 
 router.get("/sent", asyncHandler(requestSent));
-router.get("/recieved", asyncHandler(requestRecieved));
+router.get("/received", asyncHandler(requestReceived));
 
 export default router;

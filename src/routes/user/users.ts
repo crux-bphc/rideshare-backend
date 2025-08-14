@@ -40,7 +40,7 @@ const post_user = async (req: Request, res: Response) => {
     name,
   });
 
-  res.json(201).json({ message: "User created successfully" });
+  res.status(201).json({ message: "User created successfully" });
 };
 
 router.post("/", asyncHandler(post_user));
