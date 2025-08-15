@@ -7,7 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { StatusCodes } from "http-status-codes";
 import {
   rideIDSchema,
-  rideManageSchema,
+  rideRequestManageSchema,
 } from "@/validators/ride_validators.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
@@ -19,7 +19,7 @@ const manage = async (req: Request, res: Response) => {
   if (!email) return;
 
   const { rideId } = rideIDSchema.parse(req.params);
-  const { requestUserEmail, status } = rideManageSchema.parse(req.body);
+  const { requestUserEmail, status } = rideRequestManageSchema.parse(req.body);
 
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),

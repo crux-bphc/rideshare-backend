@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm/relations";
 import {
   rideMembers,
   rides,
-  stops,
   userBookmarks,
   userRequests,
   users,
@@ -16,7 +15,6 @@ export const ridesRelations = relations(rides, ({ one, many }) => ({
   rideMembers: many(rideMembers),
   userRequests: many(userRequests),
   userBookmarks: many(userBookmarks),
-  stops: many(stops),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -55,13 +53,6 @@ export const userBookmarksRelations = relations(userBookmarks, ({ one }) => ({
   }),
   ride: one(rides, {
     fields: [userBookmarks.rideId],
-    references: [rides.id],
-  }),
-}));
-
-export const stopsRelations = relations(stops, ({ one }) => ({
-  ride: one(rides, {
-    fields: [stops.rideId],
     references: [rides.id],
   }),
 }));

@@ -33,14 +33,17 @@ export const rideCreateSchema = z.object({
   departureEndTime: ISODateString,
   comments: z.string().nullable(),
   maxMemberCount: z.int().min(1), // Must have space for at least the owner
-  rideStops: z.array(z.string()).min(2), // Must have start and end location
+  rideStart: z.string(),
+  rideEnd: z.string(),
 });
 
 export const rideDismissSchema = z.object({
   dismissUserEmail: z.string(),
 });
 
-export const rideLocationSearchSchema = z.object({ search_query: z.string() });
+export const rideLocationSearchSchema = z.object({
+  search_location: z.string(),
+});
 export const rideTimeSearchSchema = z.object({
   from: ISODateString.optional(),
   by: ISODateString.optional(),
@@ -48,7 +51,7 @@ export const rideTimeSearchSchema = z.object({
   return (query.by && !query.from) || (!query.by && query.from);
 });
 
-export const rideManageSchema = z.object({
+export const rideRequestManageSchema = z.object({
   requestUserEmail: z.string(),
   status: z.enum(["accepted", "declined"]),
 });
@@ -58,5 +61,6 @@ export const rideUpdateSchema = z.object({
   departureEndTime: ISODateString.optional(),
   comments: z.string().nullable().optional(),
   maxMemberCount: z.int().min(1).optional(), // Must have space for at least the owner
-  rideStops: z.array(z.string()).min(2).optional(), // Must have start and end location - the whole set of stops must be sent
+  rideStart: z.string().optional(),
+  rideEnd: z.string().optional(), // Must have start and end location - the whole set of stops must be sent
 });

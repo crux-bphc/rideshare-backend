@@ -1,9 +1,14 @@
 // Create rides
 import express, { Request, Response } from "express";
 import { db } from "@/db/client.ts";
-import { rideMembers, rides, stops } from "@/db/schema/tables.ts";
+import { rideMembers, rides } from "@/db/schema/tables.ts";
 import { asyncHandler } from "../route_handler.ts";
-import { checkTimes, rideCreateSchema } from "@/validators/ride_validators.ts";
+import {
+  checkTimes,
+  rideCreateSchema,
+  rideIDSchema,
+} from "@/validators/ride_validators.ts";
+import { HttpError } from "../../utils/http_error.ts";
 
 const router = express.Router();
 
@@ -16,7 +21,8 @@ const createRide = async (req: Request, res: Response) => {
     departureEndTime,
     comments = "",
     maxMemberCount,
-    rideStops,
+    rideStart,
+    rideEnd,
   } = rideCreateSchema.parse(req.body);
 
   checkTimes(departureStartTime, departureEndTime, true);
@@ -28,16 +34,9 @@ const createRide = async (req: Request, res: Response) => {
       departureStartTime: new Date(departureStartTime),
       comments,
       maxMemberCount,
+      ride_start_location: rideStart,
+      ride_end_location: rideEnd,
     }).returning())[0].id;
-
-    // Add a `1` indexed ordered location of stops based on the given list of strings corresponding to locations
-    await tx.insert(stops).values(rideStops.map((value, index) => {
-      return {
-        order: index + 1,
-        rideId,
-        location: value,
-      };
-    }));
 
     // Insert the owner as a ride member
     await tx.insert(rideMembers).values({ rideId, userEmail: email });
@@ -46,7 +45,20 @@ const createRide = async (req: Request, res: Response) => {
   res.end();
 };
 
+const getRide = async (req: Request, res: Response) => {
+  const { rideId } = rideIDSchema.parse(req.params);
+
+  const ride = await db.query.rides.findFirst({
+    where: (rides, { eq }) => eq(rides.id, rideId),
+  });
+
+  if (!ride) throw new HttpError(404, "Ride Not Found");
+
+  res.json(ride);
+};
+
 // Create a new ride
 router.post("/", asyncHandler(createRide));
+router.get("/:rideId", asyncHandler(getRide));
 
 export default router;

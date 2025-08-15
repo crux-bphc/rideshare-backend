@@ -10,7 +10,7 @@ import {
 } from "@/validators/ride_validators.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
-import { rides, stops } from "@/db/schema/tables.ts";
+import { rides } from "@/db/schema/tables.ts";
 import { eq } from "drizzle-orm";
 
 const router = express.Router();
@@ -35,7 +35,8 @@ const update = async (req: Request, res: Response) => {
     departureEndTime,
     comments,
     maxMemberCount,
-    rideStops,
+    rideStart,
+    rideEnd,
   } = rideUpdateDetails;
 
   const ride = await db.query.rides.findFirst({
@@ -77,18 +78,14 @@ const update = async (req: Request, res: Response) => {
 
   await db.transaction(async (tx) => {
     // Update stops
-    if (rideStops) {
-      // Remove all stops related to the ride
-      await tx.delete(stops).where(eq(stops.rideId, rideId));
-
-      // Add new, updated stops
-      await tx.insert(stops).values(rideStops.map((value, index) => {
-        return {
-          order: index + 1,
-          rideId,
-          location: value,
-        };
-      }));
+    if (rideStart || rideEnd) {
+      // Update ride stops
+      await tx.update(rides).set({
+        ride_start_location: rideStart,
+        ride_end_location: rideEnd,
+      }).where(
+        eq(rides.id, rideId),
+      );
     }
 
     // Not sending any value will not update the field
