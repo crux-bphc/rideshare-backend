@@ -43,7 +43,7 @@ const search_rides = async (req: Request, res: Response) => {
   >`similarity(${rides.ride_end_location}, ${end})`;
 
   const found_rides = await db.select().from(rides).where(
-    and(and(gt(similarityStart, 0), gt(similarityEnd, 0)), condition),
+    and(gt(similarityStart, 0), gt(similarityEnd, 0), condition),
   ).orderBy(desc(sql`greatest(${similarityEnd}, ${similarityStart})`), order);
 
   res.json(found_rides);

@@ -231,10 +231,10 @@ Searches for a ride based on the search locations and times provided
 
 ```ts
 {
-  search_start_location: z.string(),
-  search_end_location: z.string(),
-  from: ISODateString.optional(),
-  by: ISODateString.optional(),
+  search_start_location: string,
+  search_end_location: string,
+  from: ISODateString (optional),
+  by: ISODateString (optional),
 }
 ```
 
