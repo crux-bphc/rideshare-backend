@@ -6,7 +6,6 @@ export const userRegisteredCheck: RequestHandler = async (req, res, next) => {
     const found_user = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.email, res.locals.user.email),
     });
-
     if (!found_user) {
       res.status(404).json({
         message: "Could not find user registered to this email.",

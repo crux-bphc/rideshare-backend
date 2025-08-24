@@ -9,12 +9,15 @@ import {
   rideIDSchema,
 } from "@/validators/ride_validators.ts";
 import { HttpError } from "../../utils/http_error.ts";
+import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 
 const createRide = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
-  if (!email) return;
+  if (!email) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
+  }
 
   const {
     departureStartTime,
@@ -52,7 +55,7 @@ const getRide = async (req: Request, res: Response) => {
     where: (rides, { eq }) => eq(rides.id, rideId),
   });
 
-  if (!ride) throw new HttpError(404, "Ride Not Found");
+  if (!ride) throw new HttpError(StatusCodes.NOT_FOUND, "Ride Not Found");
 
   res.json(ride);
 };
