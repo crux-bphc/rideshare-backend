@@ -3,73 +3,52 @@ import express, { Request, Response } from "express";
 import { db } from "@/db/client.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { rides } from "@/db/schema/tables.ts";
-import {
-  rideLocationSearchSchema,
-  rideTimeSearchSchema,
-} from "@/validators/ride_validators.ts";
-import { asc, between, desc, gt, or, sql } from "drizzle-orm";
+import { rideSearchSchema } from "@/validators/ride_validators.ts";
+import { and, asc, between, desc, gt, sql } from "drizzle-orm";
 import { HttpError } from "../../../utils/http_error.ts";
 
 const router = express.Router();
 
-const search_location = async (req: Request, res: Response) => {
-  const { search_location: search_query } = rideLocationSearchSchema.parse(
-    req.query,
+const search_rides = async (req: Request, res: Response) => {
+  const { search_start_location: start, search_end_location: end, by, from } =
+    rideSearchSchema.parse(
+      req.query,
+    );
+
+  // Time search
+
+  const tolerance = 1000 * 60 * 60; //One Hour
+  const time_check = from ?? by;
+
+  if (!time_check) throw new HttpError(404, "Invalid Arguments Provided");
+  const time = new Date(time_check).getTime();
+  const condition = between(
+    from ? rides.departureStartTime : rides.departureEndTime,
+    new Date(time - tolerance),
+    new Date(time + tolerance),
   );
+  const order = asc(
+    sql`abs(extract(epoch from (${
+      from ? rides.departureStartTime : rides.departureEndTime
+    } - ${time_check})))`,
+  );
+
+  // Location search
 
   const similarityStart = sql<
     number
-  >`similarity(${rides.ride_start_location}, ${search_query})`;
+  >`similarity(${rides.ride_start_location}, ${start})`;
   const similarityEnd = sql<
     number
-  >`similarity(${rides.ride_end_location}, ${search_query})`;
+  >`similarity(${rides.ride_end_location}, ${end})`;
 
   const found_rides = await db.select().from(rides).where(
-    or(gt(similarityStart, 0), gt(similarityEnd, 0)),
-  ).orderBy(desc(sql`greatest(${similarityEnd}, ${similarityStart})`));
+    and(gt(similarityStart, 0), gt(similarityEnd, 0), condition),
+  ).orderBy(desc(sql`greatest(${similarityEnd}, ${similarityStart})`), order);
 
   res.json(found_rides);
 };
 
-const search_time = async (req: Request, res: Response) => {
-  const constraints = rideTimeSearchSchema.parse(req.query);
-
-  let condition, order;
-
-  if (constraints.from) {
-    const time = new Date(constraints.from).getTime();
-    const tolerance = 1000 * 60 * 60; //One Hour
-    condition = between(
-      rides.departureStartTime,
-      new Date(time - tolerance),
-      new Date(time + tolerance),
-    );
-    order = asc(
-      sql`abs(extract(epoch from (${rides.departureStartTime} - ${constraints.from})))`,
-    );
-  } else if (constraints.by) {
-    const time = new Date(constraints.by).getTime();
-    const tolerance = 1000 * 60 * 60; //One Hour
-    condition = between(
-      rides.departureEndTime,
-      new Date(time - tolerance),
-      new Date(time + tolerance),
-    );
-    order = asc(
-      sql`abs(extract(epoch from (${rides.departureEndTime} - ${constraints.by})))`,
-    );
-  } else {
-    throw new HttpError(404, "Invalid Arguments Provided");
-  }
-
-  const found_rides = await db.select().from(rides).where(condition).orderBy(
-    order,
-  );
-
-  res.json(found_rides);
-};
-
-router.get("/location/", asyncHandler(search_location));
-router.get("/time/", asyncHandler(search_time));
+router.get("/", asyncHandler(search_rides));
 
 export default router;

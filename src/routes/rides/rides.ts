@@ -58,7 +58,7 @@ const getRide = async (req: Request, res: Response) => {
 };
 
 // Create a new ride
-router.post("/", asyncHandler(createRide));
-router.get("/:rideId", asyncHandler(getRide));
+router.post("/create/", asyncHandler(createRide));
+router.get("/get/:rideId", asyncHandler(getRide));
 
 export default router;

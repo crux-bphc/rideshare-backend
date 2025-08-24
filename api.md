@@ -87,21 +87,20 @@ This endpoint returns all requests sent **to** the current user.
 
 ## Ride Endpoints
 
-| Method   | Route                                                               | Description                    |
-| -------- | ------------------------------------------------------------------- | ------------------------------ |
-| `GET`    | [`/rides/:rideId`](#get-ridesrideid)                                | Get a specific ride by ID      |
-| `POST`   | [`/rides`](#post-rides)                                             | Create a new ride              |
-| `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid) | Accept/Deny ride request       |
-| `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)      | Update a ride                  |
-| `DELETE` | [`/rides/manage/dismiss/:rideId`](#delete-ridesmanagedismissrideid) | Remove a user from a ride      |
-| `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)   | Delete a ride                  |
-| `POST`   | [`/rides/request/:rideId`](#post-ridesrequestrideid)                | Create a ride request          |
-| `DELETE` | [`/rides/request/:rideId`](#delete-ridesrequestrideid)              | Cancel a ride request          |
-| `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                    | Leave a ride                   |
-| `GET`    | [`/rides/search/time`](#get-ridessearchtime)                        | Search for a ride by time.     |
-| `GET`    | [`/rides/search/location`](#get-ridessearchlocation)                | Search for a ride by location. |
+| Method   | Route                                                               | Description               |
+| -------- | ------------------------------------------------------------------- | ------------------------- |
+| `GET`    | [`/rides/get/:rideId`](#get-ridesgetrideid)                         | Get a specific ride by ID |
+| `POST`   | [`/rides/create`](#post-ridescreate)                                | Create a new ride         |
+| `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid) | Accept/Deny ride request  |
+| `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)      | Update a ride             |
+| `DELETE` | [`/rides/manage/dismiss/:rideId`](#delete-ridesmanagedismissrideid) | Remove a user from a ride |
+| `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)   | Delete a ride             |
+| `POST`   | [`/rides/request/:rideId`](#post-ridesrequestrideid)                | Create a ride request     |
+| `DELETE` | [`/rides/request/:rideId`](#delete-ridesrequestrideid)              | Cancel a ride request     |
+| `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                    | Leave a ride              |
+| `GET`    | [`/rides/search/`](#get-ridessearch)                                | Search for a ride         |
 
-#### `GET` `/rides/:rideId`
+#### `GET` `/rides/get/:rideId`
 
 Retrieves a ride based on rideId param.
 
@@ -122,7 +121,7 @@ Retrieves a ride based on rideId param.
 }
 ```
 
-#### `POST` `/rides/`
+#### `POST` `/rides/create/`
 
 Creates a ride based on the query provided.
 
@@ -224,46 +223,18 @@ Allows a user to leave from a ride. Ride owners cannot do this.
 
 #### Response:
 
-#### `GET` `/rides/search/time`
+#### `GET` `/rides/search/`
 
-Search for a ride based on the start time or end time. **Exactly one of either
-from or by must be provided**
+Searches for a ride based on the search locations and times provided
 
 #### Request:
 
 ```ts
 {
+  search_start_location: string,
+  search_end_location: string,
   from: ISODateString (optional),
   by: ISODateString (optional),
-}
-```
-
-#### Response:
-
-```ts
-{
-  id: number;
-  createdBy: string;
-  comments: string | null;
-  departureStartTime: ISODateString;
-  departureEndTime: ISODateString;
-  maxMemberCount: int;
-  ride_start_location: string;
-  ride_end_location: string;
-}
-[];
-```
-
-#### `GET` `/rides/search/location`
-
-Searched for a ride based on the location provided. It matches both pickup and
-drop locations and returns a sorted list of rides.
-
-#### Request:
-
-```ts
-{
-  search_location: string,
 }
 ```
 
