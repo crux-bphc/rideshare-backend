@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { db } from "@/db/client.ts";
 
-export const userRegisteredCheck: RequestHandler = async (req, res, next) => {
+export const userRegisteredCheck: RequestHandler = async (_req, res, next) => {
   if (res.locals.user.email) {
     const found_user = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.email, res.locals.user.email),

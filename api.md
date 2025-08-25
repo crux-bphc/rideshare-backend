@@ -225,7 +225,8 @@ Allows a user to leave from a ride. Ride owners cannot do this.
 
 #### `GET` `/rides/search/`
 
-Searches for a ride based on the search locations and times provided
+Searches for a ride based on the search locations and times provided. Atleast
+and Only one of `from` or `by` must be provided.
 
 #### Request:
 
