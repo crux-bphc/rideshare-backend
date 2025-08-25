@@ -16,7 +16,9 @@ const router = express.Router();
 
 const dismiss = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
-  if (!email) return;
+  if (!email) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
+  }
 
   const { rideId } = rideIDSchema.parse(req.params);
   const { dismissUserEmail } = rideDismissSchema.parse(req.body);

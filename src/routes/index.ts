@@ -10,20 +10,21 @@ import {
   update,
 } from "./rides/index.ts";
 import { userRequests, userRouter } from "./user/index.ts";
+import { userRegisteredCheck } from "../middleware/user_registered.ts";
 
 const router = express.Router();
 
 router.use("/user", userRouter);
 router.use("/user/requests", userRequests);
 
-router.use("/rides", rides);
-router.use("/rides/search", search);
-router.use("/rides/request", request);
-router.use("/rides/exit", exit);
+router.use("/rides", userRegisteredCheck, rides);
+router.use("/rides/search", userRegisteredCheck, search);
+router.use("/rides/request", userRegisteredCheck, request);
+router.use("/rides/exit", userRegisteredCheck, exit);
 
-router.use("/rides/manage/requests", manageRequest);
-router.use("/rides/manage/delete", deleteRide);
-router.use("/rides/manage/dismiss", dismiss);
-router.use("/rides/manage/update", update);
+router.use("/rides/manage/requests", userRegisteredCheck, manageRequest);
+router.use("/rides/manage/delete", userRegisteredCheck, deleteRide);
+router.use("/rides/manage/dismiss", userRegisteredCheck, dismiss);
+router.use("/rides/manage/update", userRegisteredCheck, update);
 
 export default router;

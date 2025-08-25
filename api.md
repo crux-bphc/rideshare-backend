@@ -44,7 +44,7 @@ header, and the name and phone number from the request.
 
 ```ts
 {
-  phoneNumber: string.length(10);
+  phone: string.length(10);
   name: string | null;
 }
 ```

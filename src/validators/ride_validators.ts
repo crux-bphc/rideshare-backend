@@ -22,8 +22,8 @@ export const checkTimes = (
 };
 
 export const rideCreateSchema = z.object({
-  departureStartTime: z.iso.datetime(),
-  departureEndTime: z.iso.datetime(),
+  departureStartTime: z.iso.datetime({ local: true }),
+  departureEndTime: z.iso.datetime({ local: true }),
   comments: z.string().nullable(),
   maxMemberCount: z.int().min(1), // Must have space for at least the owner
   rideStart: z.string(),
@@ -37,8 +37,8 @@ export const rideDismissSchema = z.object({
 export const rideSearchSchema = z.object({
   search_start_location: z.string(),
   search_end_location: z.string(),
-  from: z.iso.datetime().optional(),
-  by: z.iso.datetime().optional(),
+  from: z.iso.datetime({ local: true }).optional(),
+  by: z.iso.datetime({ local: true }).optional(),
 }).refine((query) => {
   return (query.by && !query.from) || (!query.by && query.from);
 });
@@ -49,8 +49,8 @@ export const rideRequestManageSchema = z.object({
 });
 
 export const rideUpdateSchema = z.object({
-  departureStartTime: z.iso.datetime().optional(),
-  departureEndTime: z.iso.datetime().optional(),
+  departureStartTime: z.iso.datetime({ local: true }).optional(),
+  departureEndTime: z.iso.datetime({ local: true }).optional(),
   comments: z.string().nullable().optional(),
   maxMemberCount: z.int().min(1).optional(), // Must have space for at least the owner
   rideStart: z.string().optional(),
