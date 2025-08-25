@@ -9,8 +9,8 @@ import { HttpError } from "../../../utils/http_error.ts";
 
 const router = express.Router();
 
-const search_rides = async (req: Request, res: Response) => {
-  const { search_start_location: start, search_end_location: end, by, from } =
+const searchRides = async (req: Request, res: Response) => {
+  const { searchStartLocation: start, searchEndLocation: end, by, from } =
     rideSearchSchema.parse(
       req.query,
     );
@@ -18,10 +18,10 @@ const search_rides = async (req: Request, res: Response) => {
   // Time search
 
   const tolerance = 1000 * 60 * 60; //One Hour
-  const time_check = from ?? by;
+  const timeCheck = from ?? by;
 
-  if (!time_check) throw new HttpError(404, "Invalid Arguments Provided");
-  const time = new Date(time_check).getTime();
+  if (!timeCheck) throw new HttpError(404, "Invalid Arguments Provided");
+  const time = new Date(timeCheck).getTime();
   const condition = between(
     from ? rides.departureStartTime : rides.departureEndTime,
     new Date(time - tolerance),
@@ -30,17 +30,17 @@ const search_rides = async (req: Request, res: Response) => {
   const order = asc(
     sql`abs(extract(epoch from (${
       from ? rides.departureStartTime : rides.departureEndTime
-    } - ${time_check})))`,
+    } - ${timeCheck})))`,
   );
 
   // Location search
 
   const similarityStart = sql<
     number
-  >`similarity(${rides.ride_start_location}, ${start})`;
+  >`similarity(${rides.rideStartLocation}, ${start})`;
   const similarityEnd = sql<
     number
-  >`similarity(${rides.ride_end_location}, ${end})`;
+  >`similarity(${rides.rideEndLocation}, ${end})`;
 
   const found_rides = await db.select().from(rides).where(
     and(gt(similarityStart, 0), gt(similarityEnd, 0), condition),
@@ -49,6 +49,6 @@ const search_rides = async (req: Request, res: Response) => {
   res.json(found_rides);
 };
 
-router.get("/", asyncHandler(search_rides));
+router.get("/", asyncHandler(searchRides));
 
 export default router;

@@ -37,8 +37,8 @@ const update = async (req: Request, res: Response) => {
     departureEndTime,
     comments,
     maxMemberCount,
-    rideStart,
-    rideEnd,
+    rideStartLocation,
+    rideEndLocation,
   } = rideUpdateDetails;
 
   const ride = await db.query.rides.findFirst({
@@ -80,11 +80,11 @@ const update = async (req: Request, res: Response) => {
 
   await db.transaction(async (tx) => {
     // Update stops
-    if (rideStart || rideEnd) {
+    if (rideStartLocation || rideEndLocation) {
       // Update ride stops
       await tx.update(rides).set({
-        ride_start_location: rideStart,
-        ride_end_location: rideEnd,
+        rideStartLocation: rideStartLocation,
+        rideEndLocation: rideEndLocation,
       }).where(
         eq(rides.id, rideId),
       );
