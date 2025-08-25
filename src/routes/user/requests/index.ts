@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 
-const requestSent = async (req: Request, res: Response) => {
+const requestSent = async (_req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
@@ -16,12 +16,14 @@ const requestSent = async (req: Request, res: Response) => {
     where: (requests, { eq }) => eq(requests.userEmail, email),
   });
 
-  if (!user_reqs.length) throw new HttpError(404, "No requests found");
+  if (!user_reqs.length) {
+    throw new HttpError(StatusCodes.NOT_FOUND, "No requests found");
+  }
 
   res.json(user_reqs);
 };
 
-const requestReceived = async (req: Request, res: Response) => {
+const requestReceived = async (_req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
@@ -32,7 +34,10 @@ const requestReceived = async (req: Request, res: Response) => {
   });
 
   if (!user_rides.length) {
-    throw new HttpError(404, "User has no rides to request.");
+    throw new HttpError(
+      StatusCodes.NOT_FOUND,
+      "User has not created any rides to request.",
+    );
   }
 
   // Collect all ride requests for each ride
