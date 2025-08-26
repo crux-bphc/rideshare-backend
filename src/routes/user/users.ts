@@ -4,12 +4,17 @@ import { users } from "@/db/schema/tables.ts";
 import { asyncHandler } from "../route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { userSchema } from "@/validators/user_validator.ts";
+import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 
 const get_user = async (_: Request, res: Response) => {
   // get user email
   const email = res.locals.user.email;
+
+  if (!email) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
+  }
 
   // finding user;
   const user = await db.query.users.findFirst({
@@ -27,7 +32,9 @@ router.get("/", asyncHandler(get_user));
 
 const post_user = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
-  if (!email) return;
+  if (!email) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
+  }
 
   const userDetails = userSchema.parse(req.body);
 
