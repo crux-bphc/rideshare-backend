@@ -100,7 +100,7 @@ This endpoint returns all requests sent **to** the current user.
 | `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                      | Leave a ride                 |
 | `GET`    | [`/rides/search/`](#get-ridessearch)                                  | Search for a ride            |
 | `POST`   | [`/rides/bookmarks/create/:rideId`](#post-ridesbookmarkscreaterideid) | Create a bookmark for a ride |
-| `GET`    | [`/rides/search/get/`](#get-ridesbookmarksget)                        | Get all user bookmarks       |
+| `GET`    | [`/rides/bookmarks/get`](#get-ridesbookmarksget)                      | Get all user bookmarks       |
 
 #### `GET` `/rides/get/:rideId`
 

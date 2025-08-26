@@ -24,7 +24,7 @@ const createBookmark = async (req: Request, res: Response) => {
     throw new HttpError(StatusCodes.NOT_FOUND, "Invalid ID provided");
   }
 
-  db.insert(userBookmarks).values(
+  await db.insert(userBookmarks).values(
     {
       userEmail: email,
       rideId,
@@ -55,7 +55,7 @@ const getBookmarks = async (_req: Request, res: Response) => {
     .innerJoin(rides, eq(rides.id, userBookmarks.rideId));
 
   if (!found_rides.length) {
-    new HttpError(StatusCodes.NOT_FOUND, "No bookmarks for this user.");
+    throw new HttpError(StatusCodes.NOT_FOUND, "No bookmarks for this user.");
   }
 
   res.status(200).json(found_rides);
