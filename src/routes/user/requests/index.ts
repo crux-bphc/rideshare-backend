@@ -12,15 +12,13 @@ const requestSent = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
-  const user_reqs = await db.query.userRequests.findMany({
+  const userReqs = await db.query.userRequests.findMany({
     where: (requests, { eq }) => eq(requests.userEmail, email),
   });
+  
+  if (!userReqs.length) throw new HttpError(404, "No requests found");
 
-  if (!user_reqs.length) {
-    throw new HttpError(StatusCodes.NOT_FOUND, "No requests found");
-  }
-
-  res.json(user_reqs);
+  res.json(userReqs);
 };
 
 const requestReceived = async (_req: Request, res: Response) => {
@@ -29,32 +27,28 @@ const requestReceived = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
-  const user_rides = await db.query.rides.findMany({
+  const userRides = await db.query.rides.findMany({
     where: (rides, { eq }) => eq(rides.createdBy, email),
   });
 
-  if (!user_rides.length) {
-    throw new HttpError(
-      StatusCodes.NOT_FOUND,
-      "User has not created any rides to request.",
-    );
-  }
+  if (!userRides.length) {
+    throw new HttpError(404, "User has no rides to request.");
 
   // Collect all ride requests for each ride
   const rideRequestsArrays = await Promise.all(
-    user_rides.map(async (ride) => {
-      const ride_requests = await db.query.userRequests.findMany({
+    userRides.map(async (ride) => {
+      const rideRequests = await db.query.userRequests.findMany({
         where: (requests, { eq }) => eq(requests.rideId, ride.id),
       });
-      return ride_requests || [];
+      return rideRequests || [];
     }),
   );
   // Flatten the array of arrays into a single array
-  const user_requests = rideRequestsArrays.flat();
+  const userRequests = rideRequestsArrays.flat();
 
-  if (!user_requests.length) throw new HttpError(404, "User has no requests");
+  if (!userRequests.length) throw new HttpError(404, "User has no requests");
 
-  res.json(user_requests);
+  res.json(userRequests);
 };
 
 router.get("/sent", asyncHandler(requestSent));

@@ -44,7 +44,7 @@ header, and the name and phone number from the request.
 
 ```ts
 {
-  phone: string.length(10);
+  phoneNumber: string.length(10);
   name: string | null;
 }
 ```
@@ -116,14 +116,14 @@ Retrieves a ride based on rideId param.
   departureStartTime: ISODateString;
   departureEndTime: ISODateString;
   maxMemberCount: int;
-  ride_start_location: string;
-  ride_end_location: string;
+  rideStartLocation: string;
+  rideEndLocation: string;
 }
 ```
 
 #### `POST` `/rides/create/`
 
-Creates a ride based on the query provided.
+Creates a ride based on the query provided. Now < Start time < End time.
 
 #### Request:
 
@@ -133,8 +133,8 @@ Creates a ride based on the query provided.
   departureEndTime: ISODateString,
   comments: string | null,
   maxMemberCount: int > 1, // Must have space for at least the owner
-  rideStart: string, // start location of ride
-  rideEnd: string, // end location of ride
+  rideStartLocation: string, // start location of ride
+  rideEndLocation: string, // end location of ride
 }
 ```
 
@@ -169,8 +169,8 @@ is optional, but one must be provided.
   departureEndTime: ISODateString (optional) ,
   comments: string (optional),
   maxMemberCount: int > 1 (optional),  // Must have space for at least the owner
-  rideStart: string (optional),
-  rideEnd: string (optional),
+  rideStartLocation: string (optional),
+  rideEndLocation: string (optional),
 }
 ```
 
@@ -225,14 +225,15 @@ Allows a user to leave from a ride. Ride owners cannot do this.
 
 #### `GET` `/rides/search/`
 
-Searches for a ride based on the search locations and times provided
+Searches for a ride based on the search locations and times provided. Atleast
+and Only one of `from` or `by` must be provided.
 
 #### Request:
 
 ```ts
 {
-  search_start_location: string,
-  search_end_location: string,
+  searchStartLocation: string,
+  searchEndLocation: string,
   from: ISODateString (optional),
   by: ISODateString (optional),
 }
@@ -248,8 +249,8 @@ Searches for a ride based on the search locations and times provided
   departureStartTime: ISODateString;
   departureEndTime: ISODateString;
   maxMemberCount: int;
-  ride_start_location: string;
-  ride_end_location: string;
+  rideStartLocation: string;
+  rideEndLocation: string;
 }
 [];
 ```

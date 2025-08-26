@@ -24,8 +24,8 @@ const createRide = async (req: Request, res: Response) => {
     departureEndTime,
     comments = "",
     maxMemberCount,
-    rideStart,
-    rideEnd,
+    rideStartLocation,
+    rideEndLocation,
   } = rideCreateSchema.parse(req.body);
 
   checkTimes(departureStartTime, departureEndTime, true);
@@ -37,8 +37,8 @@ const createRide = async (req: Request, res: Response) => {
       departureStartTime: new Date(departureStartTime),
       comments,
       maxMemberCount,
-      ride_start_location: rideStart,
-      ride_end_location: rideEnd,
+      rideStartLocation,
+      rideEndLocation,
     }).returning())[0].id;
 
     // Insert the owner as a ride member

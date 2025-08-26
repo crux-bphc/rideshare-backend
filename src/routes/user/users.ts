@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 
-const get_user = async (_: Request, res: Response) => {
+const getUser = async (_: Request, res: Response) => {
   // get user email
   const email = res.locals.user.email;
 
@@ -28,9 +28,9 @@ const get_user = async (_: Request, res: Response) => {
   res.json(user);
 };
 
-router.get("/", asyncHandler(get_user));
+router.get("/", asyncHandler(getUser));
 
-const post_user = async (req: Request, res: Response) => {
+const postUser = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
@@ -39,7 +39,7 @@ const post_user = async (req: Request, res: Response) => {
   const userDetails = userSchema.parse(req.body);
 
   const name: string = userDetails?.name ?? res.locals.user.name;
-  const phoneNumber: string = userDetails.phone;
+  const phoneNumber: string = userDetails.phoneNumber;
 
   await db.insert(users).values({
     phoneNumber,
@@ -50,6 +50,6 @@ const post_user = async (req: Request, res: Response) => {
   res.status(201).json({ message: "User created successfully" });
 };
 
-router.post("/", asyncHandler(post_user));
+router.post("/", asyncHandler(postUser));
 
 export default router;
