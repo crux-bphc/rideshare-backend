@@ -62,6 +62,6 @@ const getBookmarks = async (_req: Request, res: Response) => {
 };
 
 router.post("/create/:rideId", asyncHandler(createBookmark));
-router.get("/get/", asyncHandler(getBookmarks));
+router.get("/get", asyncHandler(getBookmarks));
 
 export default router;
