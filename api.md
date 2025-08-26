@@ -87,18 +87,20 @@ This endpoint returns all requests sent **to** the current user.
 
 ## Ride Endpoints
 
-| Method   | Route                                                               | Description               |
-| -------- | ------------------------------------------------------------------- | ------------------------- |
-| `GET`    | [`/rides/get/:rideId`](#get-ridesgetrideid)                         | Get a specific ride by ID |
-| `POST`   | [`/rides/create`](#post-ridescreate)                                | Create a new ride         |
-| `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid) | Accept/Deny ride request  |
-| `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)      | Update a ride             |
-| `DELETE` | [`/rides/manage/dismiss/:rideId`](#delete-ridesmanagedismissrideid) | Remove a user from a ride |
-| `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)   | Delete a ride             |
-| `POST`   | [`/rides/request/:rideId`](#post-ridesrequestrideid)                | Create a ride request     |
-| `DELETE` | [`/rides/request/:rideId`](#delete-ridesrequestrideid)              | Cancel a ride request     |
-| `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                    | Leave a ride              |
-| `GET`    | [`/rides/search/`](#get-ridessearch)                                | Search for a ride         |
+| Method   | Route                                                                 | Description                  |
+| -------- | --------------------------------------------------------------------- | ---------------------------- |
+| `GET`    | [`/rides/get/:rideId`](#get-ridesgetrideid)                           | Get a specific ride by ID    |
+| `POST`   | [`/rides/create`](#post-ridescreate)                                  | Create a new ride            |
+| `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid)   | Accept/Deny ride request     |
+| `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)        | Update a ride                |
+| `DELETE` | [`/rides/manage/dismiss/:rideId`](#delete-ridesmanagedismissrideid)   | Remove a user from a ride    |
+| `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)     | Delete a ride                |
+| `POST`   | [`/rides/request/:rideId`](#post-ridesrequestrideid)                  | Create a ride request        |
+| `DELETE` | [`/rides/request/:rideId`](#delete-ridesrequestrideid)                | Cancel a ride request        |
+| `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                      | Leave a ride                 |
+| `GET`    | [`/rides/search/`](#get-ridessearch)                                  | Search for a ride            |
+| `POST`   | [`/rides/bookmarks/create/:rideId`](#post-ridesbookmarkscreaterideid) | Create a bookmark for a ride |
+| `GET`    | [`/rides/search/get/`](#get-ridesbookmarksget)                        | Get all user bookmarks       |
 
 #### `GET` `/rides/get/:rideId`
 
@@ -249,6 +251,36 @@ and Only one of `from` or `by` must be provided.
   departureStartTime: ISODateString;
   departureEndTime: ISODateString;
   maxMemberCount: int;
+  rideStartLocation: string;
+  rideEndLocation: string;
+}
+[];
+```
+
+#### `POST` `/rides/bookmarks/create/:rideId`
+
+Allows a user to create a bookmark for a ride.
+
+#### Request:
+
+#### Response:
+
+#### `GET` `/rides/bookmarks/get`
+
+Gets all bookmarks for the current user.
+
+#### Request:
+
+#### Response:
+
+```ts
+{
+  id: number;
+  createdBy: string;
+  comments: string;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: number;
   rideStartLocation: string;
   rideEndLocation: string;
 }
