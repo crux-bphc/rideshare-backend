@@ -6,3 +6,7 @@ export const userSchema = z.object({
     /^\d+$/,
   ),
 });
+
+export const userEmailSchema = z.object({
+  email: z.email(),
+});

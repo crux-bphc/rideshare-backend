@@ -74,9 +74,6 @@ const request = async (req: Request, res: Response) => {
   res.end();
 };
 
-// Request to join a ride
-router.post("/:rideId", asyncHandler(request));
-
 const deleteRequest = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) {
@@ -117,6 +114,8 @@ const deleteRequest = async (req: Request, res: Response) => {
   res.end();
 };
 
+// Request to join a ride
+router.post("/:rideId", asyncHandler(request));
 router.delete("/:rideId", asyncHandler(deleteRequest));
 
 export default router;
