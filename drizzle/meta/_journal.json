@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752490158807,
-      "tag": "0000_add-extensions",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1755120480065,
-      "tag": "0001_familiar_mac_gargan",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1755958520530,
-      "tag": "0002_left_amphibian",
+      "when": 1756297749637,
+      "tag": "0000_absent_gladiator",
       "breakpoints": true
     }
   ]

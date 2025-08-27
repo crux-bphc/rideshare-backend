@@ -9,11 +9,11 @@ CREATE TABLE "rides" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"created_by" varchar NOT NULL,
 	"comments" varchar,
-	"departure_start_time" timestamp,
-	"departure_end_time" timestamp,
-	"max_member_count" integer,
-	"ride_start_location" varchar,
-	"ride_end_location" varchar
+	"departure_start_time" timestamp NOT NULL,
+	"departure_end_time" timestamp NOT NULL,
+	"max_member_count" integer NOT NULL,
+	"rideStartLocation" varchar NOT NULL,
+	"rideEndLocation" varchar NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user_bookmarks" (
@@ -30,7 +30,7 @@ CREATE TABLE "user_requests" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"phone_number" varchar,
+	"phone_number" varchar NOT NULL,
 	"email" varchar PRIMARY KEY NOT NULL,
 	"name" varchar,
 	CONSTRAINT "users_email_unique" UNIQUE("email")

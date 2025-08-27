@@ -11,7 +11,7 @@ import {
 import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
-  phoneNumber: varchar("phone_number"),
+  phoneNumber: varchar("phone_number").notNull(),
   email: varchar().unique().primaryKey(),
   name: varchar(),
 });
@@ -20,9 +20,10 @@ export const rides = pgTable("rides", {
   id: serial("id").primaryKey(),
   createdBy: varchar("created_by").notNull().references(() => users.email),
   comments: varchar(),
-  departureStartTime: timestamp("departure_start_time", { mode: "date" }),
-  departureEndTime: timestamp("departure_end_time", { mode: "date" }),
-  maxMemberCount: integer("max_member_count"),
+  departureStartTime: timestamp("departure_start_time", { mode: "date" })
+    .notNull(),
+  departureEndTime: timestamp("departure_end_time", { mode: "date" }).notNull(),
+  maxMemberCount: integer("max_member_count").notNull(),
   rideStartLocation: varchar().notNull(),
   rideEndLocation: varchar().notNull(),
 }, (_table) => [
