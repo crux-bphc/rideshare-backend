@@ -34,7 +34,6 @@ const requestReceived = async (_req: Request, res: Response) => {
   if (!userRides.length) {
     throw new HttpError(404, "User has no rides to request.");
   }
-
   // Collect all ride requests for each ride
   const rideRequestsArrays = await Promise.all(
     userRides.map(async (ride) => {
