@@ -24,8 +24,8 @@ export const rides = pgTable("rides", {
     .notNull(),
   departureEndTime: timestamp("departure_end_time", { mode: "date" }).notNull(),
   maxMemberCount: integer("max_member_count").notNull(),
-  rideStartLocation: varchar().notNull(),
-  rideEndLocation: varchar().notNull(),
+  rideStartLocation: varchar("ride_start_location").notNull(),
+  rideEndLocation: varchar("ride_end_location").notNull(),
 }, (_table) => [
   index("start_location_search_index").using(
     "gin",

@@ -1,5 +1,5 @@
 {
-  "id": "7e142fe2-fc37-4a2f-aebd-6226e187a5e9",
+  "id": "81fd42d3-38d6-45de-9264-d5f839f5938e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -104,14 +104,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "rideStartLocation": {
-          "name": "rideStartLocation",
+        "ride_start_location": {
+          "name": "ride_start_location",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "rideEndLocation": {
-          "name": "rideEndLocation",
+        "ride_end_location": {
+          "name": "ride_end_location",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
