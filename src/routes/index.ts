@@ -5,6 +5,7 @@ import {
   dismiss,
   exit,
   manageRequest,
+  members,
   request,
   rides,
   search,
@@ -19,11 +20,12 @@ router.use("/user", userRouter);
 router.use("/user/requests", userRequests);
 
 router.use("/rides", userRegisteredCheck, rides);
-router.use("/rides/search", userRegisteredCheck, search);
+router.use("/rides/search", search);
 router.use("/rides/request", userRegisteredCheck, request);
 router.use("/rides/exit", userRegisteredCheck, exit);
 
 router.use("/rides/bookmarks", userRegisteredCheck, bookmark);
+router.use("/rides/members", members);
 
 router.use("/rides/manage/requests", userRegisteredCheck, manageRequest);
 router.use("/rides/manage/delete", userRegisteredCheck, deleteRide);

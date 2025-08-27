@@ -15,7 +15,7 @@ const requestSent = async (_req: Request, res: Response) => {
   const userReqs = await db.query.userRequests.findMany({
     where: (requests, { eq }) => eq(requests.userEmail, email),
   });
-  
+
   if (!userReqs.length) throw new HttpError(404, "No requests found");
 
   res.json(userReqs);
@@ -33,7 +33,7 @@ const requestReceived = async (_req: Request, res: Response) => {
 
   if (!userRides.length) {
     throw new HttpError(404, "User has no rides to request.");
-
+  }
   // Collect all ride requests for each ride
   const rideRequestsArrays = await Promise.all(
     userRides.map(async (ride) => {
