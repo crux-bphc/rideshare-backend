@@ -1,0 +1,19 @@
+name: Host a staging instance of Rideshare Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  staging:
+    name: Build and deploy to staging
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest code and deploy with Docker
+        run: |
+          cd /home/ubuntu/clones/rideshare-backend-dev
+          git reset --hard HEAD
+          GIT_SSH_COMMAND="ssh -i /home/ubuntu/.ssh/gh-actions -o IdentitiesOnly=yes" git pull
+          docker compose --profile staging down
+          docker compose --profile staging up --build -d
