@@ -6,8 +6,10 @@ import deleteRide from "./manage/delete/index.ts";
 import dismiss from "./manage/dismiss/index.ts";
 import update from "./manage/update/index.ts";
 import manageRequest from "./manage/requests/index.ts";
+import bookmark from "./bookmarks/index.ts";
 
 export {
+  bookmark,
   deleteRide,
   dismiss,
   exit,
