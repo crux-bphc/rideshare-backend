@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  bookmark,
   deleteRide,
   dismiss,
   exit,
@@ -11,7 +10,12 @@ import {
   search,
   update,
 } from "./rides/index.ts";
-import { userRequests, userRides, userRouter } from "./user/index.ts";
+import {
+  userBookmarks,
+  userRequests,
+  userRides,
+  userRouter,
+} from "./user/index.ts";
 import { userRegisteredCheck } from "../middleware/user_registered.ts";
 
 const router = express.Router();
@@ -19,13 +23,13 @@ const router = express.Router();
 router.use("/user", userRouter);
 router.use("/user/requests", userRequests);
 router.use("/user/rides", userRides);
+router.use("/user/bookmarks", userRegisteredCheck, userBookmarks);
 
 router.use("/rides", userRegisteredCheck, rides);
 router.use("/rides/search", search);
 router.use("/rides/request", userRegisteredCheck, request);
 router.use("/rides/exit", userRegisteredCheck, exit);
 
-router.use("/rides/bookmarks", userRegisteredCheck, bookmark);
 router.use("/rides/members", members);
 
 router.use("/rides/manage/requests", userRegisteredCheck, manageRequest);

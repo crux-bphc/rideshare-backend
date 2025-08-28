@@ -11,12 +11,17 @@ Authorization: Bearer <JWT>
 
 ## User Endpoints
 
-| Method | Route                                                  | Description                          |
-| ------ | ------------------------------------------------------ | ------------------------------------ |
-| `GET`  | [`/user`](#get-user)                                   | Get the current user                 |
-| `POST` | [`/user`](#post-user)                                  | Create a new user                    |
-| `GET`  | [`/user/requests/sent`](#get-userrequestssent)         | Retrieves all requests by this user  |
-| `GET`  | [`/user/requests/received`](#get-userrequestsreceived) | Retrieves all requests for this user |
+| Method | Route                                                               | Description                                |
+| ------ | ------------------------------------------------------------------- | ------------------------------------------ |
+| `GET`  | [`/user`](#get-user)                                                | Get the current user                       |
+| `POST` | [`/user`](#post-user)                                               | Create a new user                          |
+| `GET`  | [`/user/requests/sent`](#get-userrequestssent)                      | Retrieves all requests by this user        |
+| `GET`  | [`/user/requests/received`](#get-userrequestsreceived)              | Retrieves all requests for this user       |
+| `GET`  | [`/user/rides/created`](#get-userridescreated)                      | Retrieves all rides created by this user   |
+| `GET`  | [`/user/rides/completed`](#get-userridescompleted)                  | Retrieves all rides completed by this user |
+| `GET`  | [`/user/rides/joined`](#get-userridesjoined)                        | Retrieves all rides joined by this user    |
+| `POST` | [`/user/bookmarks/create/:rideId`](#post-userbookmarkscreaterideid) | Create a bookmark for a ride               |
+| `GET`  | [`/user/bookmarks/get`](#get-userbookmarksget)                      | Get all user bookmarks                     |
 
 #### `GET` `/user`
 
@@ -85,22 +90,117 @@ This endpoint returns all requests sent **to** the current user.
 [];
 ```
 
+#### `GET` `/user/rides/created`
+
+All rides which have been created by the current user.
+
+#### Request:
+
+#### Response:
+
+```ts
+{
+  id: number;
+  createdBy: string;
+  comments: string | null;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: int;
+  rideStartLocation: string;
+  rideEndLocation: string;
+}
+[];
+```
+
+#### `GET` `/user/rides/completed`
+
+All rides which have been completed by the current user.
+
+#### Request:
+
+#### Response:
+
+```ts
+{
+  id: number;
+  createdBy: string;
+  comments: string | null;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: int;
+  rideStartLocation: string;
+  rideEndLocation: string;
+}
+[];
+```
+
+#### `GET` `/user/rides/joined`
+
+All rides which have been joined by the current user.
+
+#### Request:
+
+#### Response:
+
+```ts
+{
+  id: number;
+  createdBy: string;
+  comments: string | null;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: int;
+  rideStartLocation: string;
+  rideEndLocation: string;
+}
+[];
+```
+
+#### `POST` `/user/bookmarks/create/:rideId`
+
+Allows a user to create a bookmark for a ride.
+
+#### Request:
+
+#### Response:
+
+#### `GET` `/user/bookmarks/get`
+
+Gets all bookmarks for the current user.
+
+#### Request:
+
+#### Response:
+
+```ts
+{
+  id: number;
+  createdBy: string;
+  comments: string;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: number;
+  rideStartLocation: string;
+  rideEndLocation: string;
+}
+[];
+```
+
 ## Ride Endpoints
 
-| Method   | Route                                                                 | Description                  |
-| -------- | --------------------------------------------------------------------- | ---------------------------- |
-| `GET`    | [`/rides/get/:rideId`](#get-ridesgetrideid)                           | Get a specific ride by ID    |
-| `POST`   | [`/rides/create`](#post-ridescreate)                                  | Create a new ride            |
-| `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid)   | Accept/Deny ride request     |
-| `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)        | Update a ride                |
-| `DELETE` | [`/rides/manage/dismiss/:rideId`](#delete-ridesmanagedismissrideid)   | Remove a user from a ride    |
-| `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)     | Delete a ride                |
-| `POST`   | [`/rides/request/:rideId`](#post-ridesrequestrideid)                  | Create a ride request        |
-| `DELETE` | [`/rides/request/:rideId`](#delete-ridesrequestrideid)                | Cancel a ride request        |
-| `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                      | Leave a ride                 |
-| `GET`    | [`/rides/search/`](#get-ridessearch)                                  | Search for a ride            |
-| `POST`   | [`/rides/bookmarks/create/:rideId`](#post-ridesbookmarkscreaterideid) | Create a bookmark for a ride |
-| `GET`    | [`/rides/bookmarks/get`](#get-ridesbookmarksget)                      | Get all user bookmarks       |
+| Method   | Route                                                               | Description               |
+| -------- | ------------------------------------------------------------------- | ------------------------- |
+| `GET`    | [`/rides/get/:rideId`](#get-ridesgetrideid)                         | Get a specific ride by ID |
+| `POST`   | [`/rides/create`](#post-ridescreate)                                | Create a new ride         |
+| `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid) | Accept/Deny ride request  |
+| `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)      | Update a ride             |
+| `DELETE` | [`/rides/manage/dismiss/:rideId`](#delete-ridesmanagedismissrideid) | Remove a user from a ride |
+| `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)   | Delete a ride             |
+| `POST`   | [`/rides/request/:rideId`](#post-ridesrequestrideid)                | Create a ride request     |
+| `DELETE` | [`/rides/request/:rideId`](#delete-ridesrequestrideid)              | Cancel a ride request     |
+| `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                    | Leave a ride              |
+| `GET`    | [`/rides/search/`](#get-ridessearch)                                | Search for a ride         |
+| `GET`    | [`/rides/members/:rideId`](#get-ridesmembersrideid)                 | Get all members of ride   |
 
 #### `GET` `/rides/get/:rideId`
 
@@ -257,17 +357,9 @@ and Only one of `from` or `by` must be provided.
 [];
 ```
 
-#### `POST` `/rides/bookmarks/create/:rideId`
+#### `GET` `/rides/members/:rideId`
 
-Allows a user to create a bookmark for a ride.
-
-#### Request:
-
-#### Response:
-
-#### `GET` `/rides/bookmarks/get`
-
-Gets all bookmarks for the current user.
+Gets all members of given ride.
 
 #### Request:
 
@@ -275,14 +367,9 @@ Gets all bookmarks for the current user.
 
 ```ts
 {
-  id: number;
-  createdBy: string;
-  comments: string;
-  departureStartTime: ISODateString;
-  departureEndTime: ISODateString;
-  maxMemberCount: number;
-  rideStartLocation: string;
-  rideEndLocation: string;
+  phoneNumber: string;
+  name: string;
+  email: string;
 }
 [];
 ```
