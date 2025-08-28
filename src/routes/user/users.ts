@@ -55,8 +55,6 @@ const postUser = async (req: Request, res: Response) => {
   const name: string = userDetails?.name ?? res.locals.user.name;
   const phoneNumber: string = userDetails.phoneNumber;
 
-  console.log(name);
-
   await db.insert(users).values({
     phoneNumber,
     email,
