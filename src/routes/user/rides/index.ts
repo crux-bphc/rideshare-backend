@@ -5,6 +5,7 @@ import { HttpError } from "@/utils/http_error.ts";
 import { StatusCodes } from "http-status-codes";
 import { rideMembers, rides } from "@/db/schema/tables.ts";
 import { and, asc, eq, lt, sql } from "drizzle-orm";
+import { rideResponseObject } from "@/utils/response_schemas.ts";
 
 const router = express.Router();
 
@@ -31,16 +32,7 @@ const joined = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
-  const joinedRides = await db.select({
-    id: rides.id,
-    createdBy: rides.createdBy,
-    comments: rides.comments,
-    departureStartTime: rides.departureStartTime,
-    departureEndTime: rides.departureEndTime,
-    maxMemberCount: rides.maxMemberCount,
-    rideStartLocation: rides.rideStartLocation,
-    rideEndLocation: rides.rideEndLocation,
-  })
+  const joinedRides = await db.select(rideResponseObject)
     .from(rideMembers)
     .where(eq(rideMembers.userEmail, email))
     .innerJoin(
@@ -65,16 +57,7 @@ const completed = async (_req: Request, res: Response) => {
     sql`abs(extract(epoch from (${new Date()} - ${rides.departureEndTime})))`,
   );
 
-  const completedRides = await db.select({
-    id: rides.id,
-    createdBy: rides.createdBy,
-    comments: rides.comments,
-    departureStartTime: rides.departureStartTime,
-    departureEndTime: rides.departureEndTime,
-    maxMemberCount: rides.maxMemberCount,
-    rideStartLocation: rides.rideStartLocation,
-    rideEndLocation: rides.rideEndLocation,
-  })
+  const completedRides = await db.select(rideResponseObject)
     .from(rideMembers)
     .where(eq(rideMembers.userEmail, email))
     .innerJoin(
