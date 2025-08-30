@@ -6,6 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { rideIDSchema } from "../../../validators/ride_validators.ts";
 import { rides, userBookmarks } from "@/db/schema/tables.ts";
 import { eq } from "drizzle-orm";
+import { rideResponseObject } from "../../../utils/response_schemas.ts";
 
 const router = express.Router();
 
@@ -40,16 +41,7 @@ const getBookmarks = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
-  const found_rides = await db.select({
-    id: rides.id,
-    createdBy: rides.createdBy,
-    comments: rides.comments,
-    departureStartTime: rides.departureStartTime,
-    departureEndTime: rides.departureEndTime,
-    maxMemberCount: rides.maxMemberCount,
-    rideStartLocation: rides.rideStartLocation,
-    rideEndLocation: rides.rideEndLocation,
-  })
+  const found_rides = await db.select(rideResponseObject)
     .from(userBookmarks)
     .where(eq(userBookmarks.userEmail, email))
     .innerJoin(rides, eq(rides.id, userBookmarks.rideId));
