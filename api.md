@@ -66,9 +66,15 @@ This endpoint returns all requests sent **by** the current user.
 
 ```ts
 {
-  userEmail: string;
-  rideId: number;
   status: "accepted" | "declined" | "pending";
+  id: number;
+  createdBy: string;
+  comments: string | null;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: int;
+  rideStartLocation: string;
+  rideEndLocation: string;
 }
 [];
 ```
@@ -83,9 +89,16 @@ This endpoint returns all requests sent **to** the current user.
 
 ```ts
 {
-  userEmail: string;
-  rideId: number;
+  requestSender: string;
   status: "accepted" | "declined" | "pending";
+  id: number;
+  createdBy: string;
+  comments: string | null;
+  departureStartTime: ISODateString;
+  departureEndTime: ISODateString;
+  maxMemberCount: int;
+  rideStartLocation: string;
+  rideEndLocation: string;
 }
 [];
 ```
