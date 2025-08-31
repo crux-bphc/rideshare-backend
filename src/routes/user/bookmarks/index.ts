@@ -5,7 +5,7 @@ import { HttpError } from "@/utils/http_error.ts";
 import { StatusCodes } from "http-status-codes";
 import { rideIDSchema } from "../../../validators/ride_validators.ts";
 import { rides, userBookmarks } from "@/db/schema/tables.ts";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { rideResponseObject } from "../../../utils/response_schemas.ts";
 
 const router = express.Router();
@@ -35,6 +35,24 @@ const createBookmark = async (req: Request, res: Response) => {
   res.status(200).json({ message: "Bookmark Created Successfully." });
 };
 
+const deleteBookmark = async (req: Request, res: Response) => {
+  const { email } = res.locals.user;
+  if (!email) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
+  }
+  const { rideId } = rideIDSchema.parse(req.params);
+
+  const deleted = await db.delete(userBookmarks).where(
+    and(eq(userBookmarks.rideId, rideId), eq(userBookmarks.userEmail, email)),
+  ).returning();
+
+  if (!deleted) {
+    throw new HttpError(StatusCodes.NOT_FOUND, "Could not find bookmark.");
+  }
+
+  res.end();
+};
+
 const getBookmarks = async (_req: Request, res: Response) => {
   const { email } = res.locals.user;
   if (!email) {
@@ -53,6 +71,7 @@ const getBookmarks = async (_req: Request, res: Response) => {
   res.status(200).json(found_rides);
 };
 
+router.post("/delete/:rideId", asyncHandler(deleteBookmark));
 router.post("/create/:rideId", asyncHandler(createBookmark));
 router.get("/get", asyncHandler(getBookmarks));
 
