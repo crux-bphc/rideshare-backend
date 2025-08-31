@@ -71,7 +71,7 @@ const getBookmarks = async (_req: Request, res: Response) => {
   res.status(200).json(found_rides);
 };
 
-router.post("/delete/:rideId", asyncHandler(deleteBookmark));
+router.delete("/delete/:rideId", asyncHandler(deleteBookmark));
 router.post("/create/:rideId", asyncHandler(createBookmark));
 router.get("/get", asyncHandler(getBookmarks));
 
