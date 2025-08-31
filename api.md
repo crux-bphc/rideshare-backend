@@ -75,6 +75,7 @@ This endpoint returns all requests sent **by** the current user.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
@@ -99,6 +100,7 @@ This endpoint returns all requests sent **to** the current user.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
@@ -121,6 +123,7 @@ All rides which have been created by the current user.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
@@ -143,6 +146,7 @@ All rides which have been completed by the current user.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
@@ -165,6 +169,7 @@ All rides which have been joined by the current user.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
@@ -195,6 +200,7 @@ Gets all bookmarks for the current user.
   maxMemberCount: number;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
@@ -233,6 +239,7 @@ Retrieves a ride based on rideId param.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 ```
 
@@ -366,6 +373,7 @@ and Only one of `from` or `by` must be provided.
   maxMemberCount: int;
   rideStartLocation: string;
   rideEndLocation: string;
+  isBookmarked: boolean;
 }
 [];
 ```
