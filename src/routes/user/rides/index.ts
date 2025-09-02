@@ -3,7 +3,7 @@ import { db } from "@/db/client.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { StatusCodes } from "http-status-codes";
-import { rideMembers, rides } from "@/db/schema/tables.ts";
+import { rideMembers, rides, userBookmarks } from "@/db/schema/tables.ts";
 import { and, asc, eq, lt, sql } from "drizzle-orm";
 import { rideResponseObject } from "@/utils/response_schemas.ts";
 
@@ -15,9 +15,16 @@ const created = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
-  const createdRides = await db.query.rides.findMany({
-    where: (rides, { eq }) => eq(rides.createdBy, email),
-  });
+  const createdRides = await db.select(rideResponseObject)
+    .from(rides)
+    .where(eq(rides.createdBy, email))
+    .leftJoin(
+      userBookmarks,
+      and(
+        eq(userBookmarks.rideId, rides.id),
+        eq(userBookmarks.userEmail, email),
+      ),
+    );
 
   if (!createdRides.length) {
     throw new HttpError(404, "User has not made any rides.");
@@ -38,6 +45,13 @@ const joined = async (_req: Request, res: Response) => {
     .innerJoin(
       rides,
       eq(rides.id, rideMembers.rideId),
+    )
+    .leftJoin(
+      userBookmarks,
+      and(
+        eq(userBookmarks.rideId, rides.id),
+        eq(userBookmarks.userEmail, email),
+      ),
     );
 
   if (!joinedRides.length) {
@@ -65,6 +79,13 @@ const completed = async (_req: Request, res: Response) => {
       and(
         eq(rides.id, rideMembers.rideId),
         lt(rides.departureEndTime, new Date()),
+      ),
+    )
+    .leftJoin(
+      userBookmarks,
+      and(
+        eq(userBookmarks.rideId, rides.id),
+        eq(userBookmarks.userEmail, email),
       ),
     )
     .orderBy(order);

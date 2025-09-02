@@ -50,14 +50,25 @@ const createRide = async (req: Request, res: Response) => {
 
 const getRide = async (req: Request, res: Response) => {
   const { rideId } = rideIDSchema.parse(req.params);
+  const { email } = res.locals.user;
+  if (!email) {
+    throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
+  }
 
+  const bookmarked = await db.query.userBookmarks.findFirst({
+    where: (bookmark, { eq, and }) =>
+      and(eq(bookmark.rideId, rideId), eq(bookmark.userEmail, email)),
+  });
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
   });
 
   if (!ride) throw new HttpError(StatusCodes.NOT_FOUND, "Ride Not Found");
 
-  res.json(ride);
+  res.json({
+    ...ride,
+    isBookmarked: bookmarked !== undefined,
+  });
 };
 
 // Create a new ride

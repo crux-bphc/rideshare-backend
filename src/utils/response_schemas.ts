@@ -1,4 +1,5 @@
-import { rides } from "@/db/schema/tables.ts";
+import { rides, userBookmarks } from "@/db/schema/tables.ts";
+import { sql } from "drizzle-orm";
 
 export const rideResponseObject = {
   id: rides.id,
@@ -9,4 +10,5 @@ export const rideResponseObject = {
   maxMemberCount: rides.maxMemberCount,
   rideStartLocation: rides.rideStartLocation,
   rideEndLocation: rides.rideEndLocation,
+  isBookmarked: sql<boolean>`${userBookmarks.userEmail} is not null`,
 };

@@ -3,7 +3,7 @@ import { db } from "@/db/client.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { StatusCodes } from "http-status-codes";
-import { rides, userRequests } from "@/db/schema/tables.ts";
+import { rides, userBookmarks, userRequests } from "@/db/schema/tables.ts";
 import { and, eq } from "drizzle-orm";
 import { rideResponseObject } from "@/utils/response_schemas.ts";
 const router = express.Router();
@@ -19,7 +19,14 @@ const requestSent = async (_req: Request, res: Response) => {
     ...rideResponseObject,
   }).from(userRequests)
     .where(eq(userRequests.userEmail, email))
-    .innerJoin(rides, eq(rides.id, userRequests.rideId));
+    .innerJoin(rides, eq(rides.id, userRequests.rideId))
+    .leftJoin(
+      userBookmarks,
+      and(
+        eq(userBookmarks.rideId, rides.id),
+        eq(userBookmarks.userEmail, email),
+      ),
+    );
 
   if (!requestedRides.length) throw new HttpError(404, "No requests found");
 
@@ -40,6 +47,13 @@ const requestReceived = async (_req: Request, res: Response) => {
     .innerJoin(
       rides,
       and(eq(rides.id, userRequests.rideId), eq(rides.createdBy, email)),
+    )
+    .leftJoin(
+      userBookmarks,
+      and(
+        eq(userBookmarks.rideId, rides.id),
+        eq(userBookmarks.userEmail, email),
+      ),
     );
 
   if (!requestedRides.length) {
