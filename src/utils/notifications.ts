@@ -43,3 +43,14 @@ export const getTokens = async (match: string) => {
   });
   return user?.tokens ?? [];
 };
+
+export const getMemberTokens = async (rideId: number, createdBy: string) => {
+  const members = await db.query.rideMembers.findMany({
+    where: (mem, { eq, and, not }) =>
+      and(eq(mem.rideId, rideId), not(eq(mem.userEmail, createdBy))),
+    columns: { rideId: false },
+    with: { user: { columns: { tokens: true } } },
+  });
+
+  return members.map((v) => v.user.tokens).reduce((p, c) => p.concat(c));
+};

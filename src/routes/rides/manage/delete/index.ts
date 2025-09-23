@@ -8,7 +8,8 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
-import { getTokens, sendMessage } from "../../../../utils/notifications.ts";
+import { getMemberTokens, getTokens } from "../../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../../bullmq/queue.ts";
 
 const router = express.Router();
 
@@ -36,20 +37,10 @@ const deleteRide = async (req: Request, res: Response) => {
     );
   }
 
-  const members = await db.query.rideMembers.findMany({
-    where: (mem, { eq }) => eq(mem.rideId, ride.id),
-    columns: { rideId: false },
-    with: { user: { columns: { tokens: true } } },
-  });
-
-  const tokens = members.map((v) => v.user.tokens).reduce((p, c) =>
-    p.concat(c)
-  );
-
-  await sendMessage(
+  await sendToMessageQueue(
     `Your ride has been deleted!`,
     `Your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} was deleted by the owner! Look for similar rides in the app!`,
-    tokens,
+    await getMemberTokens(ride.id, ride.createdBy),
   );
 
   await db.delete(rides).where(eq(rides.id, rideId));

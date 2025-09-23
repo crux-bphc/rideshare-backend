@@ -8,7 +8,8 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
-import { getTokens, sendMessage } from "../../../utils/notifications.ts";
+import { getTokens } from "../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../bullmq/queue.ts";
 
 const router = express.Router();
 
@@ -71,7 +72,7 @@ const request = async (req: Request, res: Response) => {
     status: "pending",
   });
 
-  await sendMessage(
+  await sendToMessageQueue(
     `${ride.user.name} wants to join your ride!`,
     `The user ${ride.user.name} has requested to join your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`,
     await getTokens(ride.createdBy),

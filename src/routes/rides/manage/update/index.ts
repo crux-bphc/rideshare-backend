@@ -12,7 +12,8 @@ import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rides } from "@/db/schema/tables.ts";
 import { eq } from "drizzle-orm";
-import { sendMessage } from "../../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../../bullmq/queue.ts";
+import { getMemberTokens } from "../../../../utils/notifications.ts";
 
 const router = express.Router();
 
@@ -107,21 +108,11 @@ const update = async (req: Request, res: Response) => {
     );
   });
 
-  const members = await db.query.rideMembers.findMany({
-    where: (mem, { eq }) => eq(mem.rideId, ride.id),
-    columns: { rideId: false },
-    with: { user: { columns: { tokens: true } } },
-  });
-
-  const tokens = members.map((v) => v.user.tokens).reduce((p, c) =>
-    p.concat(c)
-  );
-
-  await sendMessage(
+  await sendToMessageQueue(
     `Your ride has been updated`,
     // TODO?: Ideally the user should click the notif and it should redirect to theride
     `The ride created by ${ride.user.name} has been updated`,
-    tokens,
+    await getMemberTokens(ride.id, ride.createdBy),
   );
 
   res.end();

@@ -11,7 +11,8 @@ import {
 } from "@/validators/ride_validators.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
-import { getTokens, sendMessage } from "../../../../utils/notifications.ts";
+import { getTokens } from "../../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../../bullmq/queue.ts";
 
 const router = express.Router();
 
@@ -96,7 +97,7 @@ const manage = async (req: Request, res: Response) => {
   });
 
   const mood = status === "accepted" ? `${status}!` : `${status}.`;
-  await sendMessage(
+  await sendToMessageQueue(
     `Your join request was ${mood}`,
     `Your request to join the ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} was ${mood}`,
     await getTokens(requestUser.userEmail),
