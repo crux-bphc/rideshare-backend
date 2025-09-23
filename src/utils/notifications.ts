@@ -44,10 +44,14 @@ export const getTokens = async (match: string) => {
   return user?.tokens ?? [];
 };
 
-export const getMemberTokens = async (rideId: number, createdBy: string) => {
+export const getMemberTokens = async (rideId: number, createdBy?: string) => {
   const members = await db.query.rideMembers.findMany({
-    where: (mem, { eq, and, not }) =>
-      and(eq(mem.rideId, rideId), not(eq(mem.userEmail, createdBy))),
+    where: (mem, { eq, and, not }) => {
+      if (createdBy) { // send to everyone except owner
+        return and(eq(mem.rideId, rideId), not(eq(mem.userEmail, createdBy)));
+      }
+      return eq(mem.rideId, rideId); // send to everyone
+    },
     columns: { rideId: false },
     with: { user: { columns: { tokens: true } } },
   });

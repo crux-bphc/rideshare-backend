@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
-import { getTokens } from "../../../utils/notifications.ts";
+import { getMemberTokens, getTokens } from "../../../utils/notifications.ts";
 import { sendToMessageQueue } from "../../../bullmq/queue.ts";
 
 const router = express.Router();
@@ -67,20 +67,10 @@ const exit = async (req: Request, res: Response) => {
     );
   });
 
-  const members = await db.query.rideMembers.findMany({
-    where: (mem, { eq }) => eq(mem.rideId, ride.id),
-    columns: { rideId: false },
-    with: { user: { columns: { tokens: true } } },
-  });
-
-  const tokens = members.map((v) => v.user.tokens).reduce((p, c) =>
-    p.concat(c)
-  );
-
   await sendToMessageQueue(
     `${member.user.name} left!`,
     `The member ${member.user.name} has left your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`,
-    tokens,
+    await getMemberTokens(ride.id),
   );
 
   res.end();
