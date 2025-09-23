@@ -80,7 +80,7 @@ services:
       - dev
       - prod
 
-  redis: # staging version needed here?
+  redis:
     image: redis:8.2.1
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
