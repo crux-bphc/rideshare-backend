@@ -8,6 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
+import { getTokens, sendMessage } from "../../../utils/notifications.ts";
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ const request = async (req: Request, res: Response) => {
   // Check if ride members can allow another member into the ride
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
+    with: { user: { columns: { name: true } } }, // for some reason createdBy is named as user in the references?
   });
 
   if (!ride) {
@@ -34,8 +36,8 @@ const request = async (req: Request, res: Response) => {
 
   // User is already in ride / they created the ride
   if (
-    members.filter((member) => member.userEmail == email).length > 0 ||
-    ride.createdBy == email
+    members.filter((member) => member.userEmail === email).length > 0 ||
+    ride.createdBy === email
   ) {
     throw new HttpError(
       StatusCodes.CONFLICT,
@@ -69,7 +71,11 @@ const request = async (req: Request, res: Response) => {
     status: "pending",
   });
 
-  // Notify ride owner about the new ride request here
+  await sendMessage(
+    `${ride.user.name} wants to join your ride!`,
+    `The user ${ride.user.name} has requested to join your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`,
+    await getTokens(ride.createdBy),
+  );
 
   res.end();
 };
@@ -111,6 +117,7 @@ const deleteRequest = async (req: Request, res: Response) => {
       eq(userRequests.userEmail, email),
     ),
   );
+
   res.end();
 };
 

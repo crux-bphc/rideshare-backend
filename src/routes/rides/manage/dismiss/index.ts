@@ -11,6 +11,7 @@ import {
 } from "@/validators/ride_validators.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
+import { getTokens, sendMessage } from "../../../../utils/notifications.ts";
 
 const router = express.Router();
 
@@ -72,6 +73,11 @@ const dismiss = async (req: Request, res: Response) => {
   });
 
   // Notify requested user about their ride status here
+  await sendMessage(
+    `You have been removed`,
+    `You were removed from the ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}!`,
+    await getTokens(dismissUserEmail),
+  );
 
   res.end();
 };

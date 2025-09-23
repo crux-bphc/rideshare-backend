@@ -12,13 +12,20 @@ cp .env.example .env
 
 Note: If you're running `drizzle-kit` outside docker, change this to `localhost`
 
-2. Use Docker to run the watcher
+2. Aquire the service account private key through Google cloud console:
+   - https://console.cloud.google.com/iam-admin/serviceaccounts, create a
+     project if not already created
+   - Then go to: Actions > Manage Keys > Add Key
+   - Download the JSON file
+   - Put it in the project and point its path to GOOGLE_APPLICATION_CREDENTIALS
+
+3. Use Docker to run the watcher
 
 ```
 docker compose --profile dev up --build --watch
 ```
 
-3. To migrate the database, run
+4. To migrate the database, run
 
 ```
 docker compose exec web-dev deno run db migrate
