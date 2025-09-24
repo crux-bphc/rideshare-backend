@@ -110,3 +110,25 @@ services:
       - ${REDIS_PORT}:${REDIS_PORT}
     profiles:
       - staging
+
+  fcm-notifs:
+    build: ./notifications
+    env_file: .env
+    develop:
+      watch:
+        - action: sync
+          path: ./notifications
+          target: ./app
+    depends_on:
+      - redis
+    profiles:
+      - dev
+      - prod
+
+  fcm-notifs-staging:
+    build: ./notifications
+    env_file: .env.staging
+    depends_on:
+      - redis-staging
+    profiles:
+      - staging

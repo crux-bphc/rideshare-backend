@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
-import { getMemberTokens, getTokens } from "../../../utils/notifications.ts";
+import { getMemberTokens } from "../../../utils/notifications.ts";
 import { sendToMessageQueue } from "../../../bullmq/queue.ts";
 
 const router = express.Router();

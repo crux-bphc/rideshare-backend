@@ -1,5 +1,10 @@
 import { Queue } from "bullmq";
-import { connection } from "./exports.ts";
+
+const connection = {
+  host: Deno.env.get("REDIS_HOST") ?? "redis",
+  port: parseInt(Deno.env.get("REDIS_PORT") ?? "6379"),
+  password: Deno.env.get("REDIS_PASSWORD") ?? "",
+};
 
 export const queue = new Queue("fcm-queue", { connection });
 

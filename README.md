@@ -17,7 +17,7 @@ Note: If you're running `drizzle-kit` outside docker, change this to `localhost`
      project if not already created
    - Then go to: Actions > Manage Keys > Add Key
    - Download the JSON file
-   - Put it in the project and point its path to GOOGLE_APPLICATION_CREDENTIALS
+   - Put it in the notifications folder and point its path to GOOGLE_APPLICATION_CREDENTIALS relative to this folder
 
 3. Use Docker to run the watcher
 

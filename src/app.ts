@@ -1,9 +1,6 @@
 import express from "express";
 import routes from "./routes/index.ts";
 import { logtoMiddleware } from "./middleware/logto.ts";
-import { startFCMQueue } from "./bullmq/exports.ts";
-
-startFCMQueue(); // Do not start in async in order to not block the main thread
 
 const app = express();
 app.use(express.json());
