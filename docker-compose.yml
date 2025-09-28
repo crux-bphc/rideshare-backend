@@ -123,7 +123,6 @@ services:
       - redis
     profiles:
       - dev
-      - prod
 
   fcm-notifs-staging:
     build: ./notifications
