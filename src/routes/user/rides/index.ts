@@ -68,7 +68,7 @@ const completed = async (_req: Request, res: Response) => {
   }
 
   const order = asc(
-    sql`abs(extract(epoch from (${new Date()} - ${rides.departureEndTime})))`,
+    sql`abs(extract(epoch from (NOW() - ${rides.departureEndTime})))`,
   );
 
   const completedRides = await db.select(rideResponseObject)
