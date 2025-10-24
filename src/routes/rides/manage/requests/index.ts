@@ -11,6 +11,8 @@ import {
 } from "@/validators/ride_validators.ts";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
+import { getTokens } from "../../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../../bullmq/queue.ts";
 
 const router = express.Router();
 
@@ -66,7 +68,7 @@ const manage = async (req: Request, res: Response) => {
 
   // Check if member already exists
   if (
-    members.filter((member) => member.userEmail == requestUserEmail)
+    members.filter((member) => member.userEmail === requestUserEmail)
       .length >
       0
   ) {
@@ -94,7 +96,12 @@ const manage = async (req: Request, res: Response) => {
     }
   });
 
-  // Notify requested user about their ride status here
+  const mood = status === "accepted" ? `${status}!` : `${status}.`;
+  await sendToMessageQueue(
+    `Your join request was ${mood}`,
+    `Your request to join the ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} was ${mood}`,
+    await getTokens(requestUser.userEmail),
+  );
 
   res.end();
 };

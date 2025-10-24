@@ -8,6 +8,8 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
+import { getMemberTokens, getTokens } from "../../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../../bullmq/queue.ts";
 
 const router = express.Router();
 
@@ -35,7 +37,12 @@ const deleteRide = async (req: Request, res: Response) => {
     );
   }
 
-  // Notify ride members, and people who requested the ride that it has been deleted here
+  await sendToMessageQueue(
+    `Your ride has been deleted!`,
+    `Your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} was deleted by the owner! Look for similar rides in the app!`,
+    await getMemberTokens(ride.id, ride.createdBy),
+  );
+
   await db.delete(rides).where(eq(rides.id, rideId));
 
   res.end();

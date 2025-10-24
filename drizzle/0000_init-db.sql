@@ -35,6 +35,7 @@ CREATE TABLE "users" (
 	"phone_number" varchar NOT NULL,
 	"email" varchar PRIMARY KEY NOT NULL,
 	"name" varchar,
+	"tokens" text[] DEFAULT '{}' NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

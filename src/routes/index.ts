@@ -11,6 +11,7 @@ import {
   update,
 } from "./rides/index.ts";
 import {
+  tokens,
   userBookmarks,
   userRequests,
   userRides,
@@ -24,6 +25,7 @@ router.use("/user", userRouter);
 router.use("/user/requests", userRequests);
 router.use("/user/rides", userRides);
 router.use("/user/bookmarks", userRegisteredCheck, userBookmarks);
+router.use("/user/tokens", tokens);
 
 router.use("/rides", userRegisteredCheck, rides);
 router.use("/rides/search", search);

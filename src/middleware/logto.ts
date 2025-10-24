@@ -23,7 +23,7 @@ export const logtoMiddleware: RequestHandler = async (req, res, next) => {
 
   // Bearer <token>
   const split = req.headers.authorization?.split(" ") ?? [];
-  if (split.length != 2 || split[0].toLowerCase() !== "bearer") {
+  if (split.length !== 2 || split[0].toLowerCase() !== "bearer") {
     res
       .status(400) // Bad request
       .json({ message: "Malformed authorization header" });
