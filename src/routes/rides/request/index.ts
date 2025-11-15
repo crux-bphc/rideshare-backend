@@ -24,7 +24,6 @@ const request = async (req: Request, res: Response) => {
   // Check if ride members can allow another member into the ride
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
-    with: { user: { columns: { name: true } } }, // for some reason createdBy is named as user in the references?
   });
 
   if (!ride) {
@@ -73,8 +72,8 @@ const request = async (req: Request, res: Response) => {
   });
 
   await sendToMessageQueue(
-    `${ride.user.name} wants to join your ride!`,
-    `The user ${ride.user.name} has requested to join your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`,
+    `${res.locals.user.name} wants to join your ride!`,
+    `The user ${res.locals.user.name} has requested to join your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`,
     await getTokens(ride.createdBy),
   );
 

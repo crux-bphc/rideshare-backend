@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
-import { getMemberTokens } from "../../../utils/notifications.ts";
+import { getMemberTokens, getTokens } from "../../../utils/notifications.ts";
 import { sendToMessageQueue } from "../../../bullmq/queue.ts";
 
 const router = express.Router();
@@ -67,10 +67,18 @@ const exit = async (req: Request, res: Response) => {
     );
   });
 
+  const template = `from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`;
+
   await sendToMessageQueue(
     `${member.user.name} left!`,
-    `The member ${member.user.name} has left your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`,
-    await getMemberTokens(ride.id),
+    `${member.user.name} has left the ride ${template} that you are a part of`,
+    await getMemberTokens(ride.id, ride.createdBy),
+  );
+
+  await sendToMessageQueue(
+    `${member.user.name} left!`,
+    `${member.user.name} has left your ride ${template}`,
+    await getTokens(ride.createdBy),
   );
 
   res.end();

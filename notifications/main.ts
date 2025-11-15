@@ -12,9 +12,7 @@ const worker = new Worker("fcm-queue", async (job) => {
     const { tokens, title, message } = data;
 
     console.log("Sending: ", { title, message });
-    const result = await sendMessage(title, message, tokens);
-
-    return result;
+    await sendMessage(title, message, tokens);
 }, { connection });
 
 worker.on("completed", (job) => {

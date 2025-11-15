@@ -20,5 +20,6 @@ export const getMemberTokens = async (rideId: number, createdBy?: string) => {
     with: { user: { columns: { tokens: true } } },
   });
 
-  return members.map((v) => v.user.tokens).reduce((p, c) => p.concat(c));
+  // findMany returns an empty array if no matches found, same with v.user
+  return members.flatMap((v) => v.user.tokens);
 };

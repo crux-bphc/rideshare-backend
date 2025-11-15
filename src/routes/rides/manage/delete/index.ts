@@ -23,6 +23,7 @@ const deleteRide = async (req: Request, res: Response) => {
 
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
+    with: { user: { columns: { name: true } } },
   });
 
   if (!ride) {
@@ -39,7 +40,7 @@ const deleteRide = async (req: Request, res: Response) => {
 
   await sendToMessageQueue(
     `Your ride has been deleted!`,
-    `Your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} was deleted by the owner! Look for similar rides in the app!`,
+    `Your ride from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} was deleted by ${ride.user.name}! Look for similar rides in the app!`,
     await getMemberTokens(ride.id, ride.createdBy),
   );
 
