@@ -1,0 +1,17 @@
+{
+  "name": "notifications",
+  "version": "1.0.0",
+  "description": "container to send notifications",
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "main": "main.ts",
+  "scripts": {
+    "dev": "node --watch main.ts"
+  },
+  "dependencies": {
+    "bullmq": "^5.58.7",
+    "firebase-admin": "^13.5.0",
+    "postgres": "^3.4.7"
+  }
+}

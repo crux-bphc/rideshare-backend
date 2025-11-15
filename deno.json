@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch --allow-net --allow-env --allow-read main.ts",
+    "dev": "deno run --watch --allow-net --allow-env --allow-run --allow-read main.ts",
     "prod": "deno run --allow-net --allow-env --allow-read main.ts",
     "db": "deno --env -A --node-modules-dir npm:drizzle-kit"
   },
@@ -8,6 +8,7 @@
     "@std/assert": "jsr:@std/assert@^1.0.13",
     "@types/express": "npm:@types/express@^5.0.3",
     "@types/express-serve-static-core": "npm:@types/express-serve-static-core@^5.0.7",
+    "bullmq": "npm:bullmq@^5.58.7",
     "drizzle-orm": "npm:drizzle-orm@^0.44.2",
     "drizzle-zod": "npm:drizzle-zod@^0.8.2",
     "http-status-codes": "npm:http-status-codes@^2.3.0",

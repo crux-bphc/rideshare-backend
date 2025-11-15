@@ -5,6 +5,7 @@ import {
   pgTable,
   primaryKey,
   serial,
+  text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -14,6 +15,7 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number").notNull(),
   email: varchar().unique().primaryKey(),
   name: varchar(),
+  tokens: text("tokens").array().notNull().default([]),
 });
 
 export const rides = pgTable("rides", {

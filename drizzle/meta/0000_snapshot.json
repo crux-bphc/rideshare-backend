@@ -1,5 +1,5 @@
 {
-  "id": "81fd42d3-38d6-45de-9264-d5f839f5938e",
+  "id": "f6c7203c-21ce-41ca-8cde-858dbd715f78",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -304,6 +304,13 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
+        },
+        "tokens": {
+          "name": "tokens",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
         }
       },
       "indexes": {},
