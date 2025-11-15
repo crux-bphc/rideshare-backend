@@ -81,8 +81,6 @@ const update = async (req: Request, res: Response) => {
     }
   }
 
-  const [oldStart, oldEnd, oldDeparture] = [ride.rideStartLocation, ride.rideEndLocation, ride.departureEndTime.toLocaleDateString()];
-
   await db.transaction(async (tx) => {
     // Update stops
     if (rideStartLocation || rideEndLocation) {
@@ -113,7 +111,7 @@ const update = async (req: Request, res: Response) => {
   await sendToMessageQueue(
     `Your ride has been updated`,
     // TODO?: Ideally the user should click the notif and it should redirect to theride
-    `The ride created by ${ride.user.name} from ${oldStart} to ${oldEnd} that departs at ${oldDeparture} has been updated. Check the app for the updated details`,
+    `The ride created by ${ride.user.name} from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} has been updated. Check the app for updated details`,
     await getMemberTokens(ride.id, ride.createdBy),
   );
 
