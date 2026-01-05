@@ -5,3 +5,4 @@ drizzle-cli
 node_modules
 test.*
 testing
+service-account-key.json

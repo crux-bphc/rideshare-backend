@@ -8,6 +8,8 @@ import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rideIDSchema } from "@/validators/ride_validators.ts";
+import { getMemberTokens, getTokens } from "../../../utils/notifications.ts";
+import { sendToMessageQueue } from "../../../bullmq/queue.ts";
 
 const router = express.Router();
 
@@ -27,9 +29,10 @@ const exit = async (req: Request, res: Response) => {
     throw new HttpError(StatusCodes.NOT_FOUND, "The given ride was not found!");
   }
 
-  const member = db.query.rideMembers.findFirst({
+  const member = await db.query.rideMembers.findFirst({
     where: (member, { and, eq }) =>
       and(eq(member.rideId, rideId), eq(member.userEmail, email)),
+    with: { user: { columns: { name: true } } },
   });
 
   // Check if the user is in the ride
@@ -64,7 +67,19 @@ const exit = async (req: Request, res: Response) => {
     );
   });
 
-  // Notify the owner of the ride that the user left the ride here
+  const template = `from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()}`;
+
+  await sendToMessageQueue(
+    `${member.user.name} left!`,
+    `${member.user.name} has left the ride ${template} that you are a part of`,
+    await getMemberTokens(ride.id, ride.createdBy),
+  );
+
+  await sendToMessageQueue(
+    `${member.user.name} left!`,
+    `${member.user.name} has left your ride ${template}`,
+    await getTokens(ride.createdBy),
+  );
 
   res.end();
 };

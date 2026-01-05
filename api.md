@@ -22,6 +22,7 @@ Authorization: Bearer <JWT>
 | `GET`  | [`/user/rides/joined`](#get-userridesjoined)                        | Retrieves all rides joined by this user    |
 | `POST` | [`/user/bookmarks/create/:rideId`](#post-userbookmarkscreaterideid) | Create a bookmark for a ride               |
 | `GET`  | [`/user/bookmarks/get`](#get-userbookmarksget)                      | Get all user bookmarks                     |
+| `POST` | [`/user/tokens`](#post-usertokens)                                  | Register Firebase Cloud Messaging token    |
 
 #### `GET` `/user`
 
@@ -204,6 +205,22 @@ Gets all bookmarks for the current user.
 }
 [];
 ```
+
+#### `POST` `/user/tokens`
+
+Add FCM device token for this user
+
+#### Request:
+
+```ts
+{
+  token: string;
+}
+```
+
+#### Response:
+
+status: 200
 
 ## Ride Endpoints
 

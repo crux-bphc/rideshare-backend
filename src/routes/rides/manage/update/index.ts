@@ -12,6 +12,8 @@ import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { rides } from "@/db/schema/tables.ts";
 import { eq } from "drizzle-orm";
+import { sendToMessageQueue } from "../../../../bullmq/queue.ts";
+import { getMemberTokens } from "../../../../utils/notifications.ts";
 
 const router = express.Router();
 
@@ -43,6 +45,7 @@ const update = async (req: Request, res: Response) => {
 
   const ride = await db.query.rides.findFirst({
     where: (rides, { eq }) => eq(rides.id, rideId),
+    with: { user: { columns: { name: true } } },
   });
 
   if (!ride) {
@@ -104,6 +107,13 @@ const update = async (req: Request, res: Response) => {
       eq(rides.id, rideId),
     );
   });
+
+  await sendToMessageQueue(
+    `Your ride has been updated`,
+    // TODO?: Ideally the user should click the notif and it should redirect to theride
+    `The ride created by ${ride.user.name} from ${ride.rideStartLocation} to ${ride.rideEndLocation} that departs at ${ride.departureEndTime.toLocaleDateString()} has been updated. Check the app for updated details`,
+    await getMemberTokens(ride.id, ride.createdBy),
+  );
 
   res.end();
 };
