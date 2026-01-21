@@ -77,22 +77,29 @@ const searchLocation = async (req: Request, res: Response) => {
   const similarityEnd = sql<number>`similarity(${rides.rideEndLocation}, ${searchParam})`;
 
   const startLocs = await db
-    .select({ result: rides.rideStartLocation, sim: similarityStart })
+    .select({ location: rides.rideStartLocation, sim: similarityStart })
     .from(rides)
     .where(gt(similarityStart, 0));
   const endLocs = await db
-    .select({ result: rides.rideEndLocation, sim: similarityEnd })
+    .select({ location: rides.rideEndLocation, sim: similarityEnd })
     .from(rides)
     .where(gt(similarityEnd, 0));
 
-  console.log(startLocs);
-  console.log(endLocs);
+  const locationMap = new Map<string, number>();
 
-  const merged = [...startLocs, ...endLocs]
-    .sort((a, b) => b.sim - a.sim)
-    .map((item) => item.result);
+  for (const { location, sim } of [...startLocs, ...endLocs]) {
+    const prev = locationMap.get(location);
+    if (prev === undefined || sim > prev) {
+      locationMap.set(location, sim);
+    }
+  }
 
-  res.json(merged.slice(0, 5));
+  const result = [...locationMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([location]) => location);
+
+  res.json(result);
 };
 
 router.get("/", asyncHandler(searchRides));
