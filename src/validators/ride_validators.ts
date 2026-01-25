@@ -9,11 +9,11 @@ export const checkTimes = (
   endTime: string,
   checkNow: boolean,
 ) => {
-  const start = (new Date(startTime)).getTime(),
-    end = (new Date(endTime)).getTime(),
+  const start = new Date(startTime).getTime(),
+    end = new Date(endTime).getTime(),
     now = Date.now();
 
-  if (end < start || (checkNow ? (start < now || end < now) : false)) {
+  if (end < start || (checkNow ? start < now || end < now : false)) {
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
       "Invalid departure start and / or end time!",
@@ -34,13 +34,19 @@ export const rideDismissSchema = z.object({
   dismissUserEmail: z.string(),
 });
 
-export const rideSearchSchema = z.object({
-  searchStartLocation: z.string(),
-  searchEndLocation: z.string(),
-  from: z.iso.datetime({ local: true }).optional(),
-  by: z.iso.datetime({ local: true }).optional(),
-}).refine((query) => {
-  return (query.by && !query.from) || (!query.by && query.from);
+export const rideSearchSchema = z
+  .object({
+    searchStartLocation: z.string(),
+    searchEndLocation: z.string(),
+    from: z.iso.datetime({ local: true }).optional(),
+    by: z.iso.datetime({ local: true }).optional(),
+  })
+  .refine((query) => {
+    return (query.by && !query.from) || (!query.by && query.from);
+  });
+
+export const locationSearchSchema = z.object({
+  searchParam: z.string(),
 });
 
 export const rideRequestManageSchema = z.object({
