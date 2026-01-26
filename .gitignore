@@ -6,3 +6,4 @@ node_modules
 test.*
 testing
 service-account-key.json
+copilot-instructions.md
