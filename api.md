@@ -388,9 +388,7 @@ Empty response on success.
 | `DELETE` | [`/rides/exit/:rideId`](#delete-ridesexitrideid)                    | Leave a ride              |
 | `GET`    | [`/rides/search`](#get-ridessearch)                                 | Search for rides          |
 | `GET`    | [`/rides/members/:rideId`](#get-ridesmembersrideid)                 | Get all members of ride   |
-| `GET`    | [`/rides/location/id`](#get-rideslocationid)                        | Get location by ID        |
-| `GET`    | [`/rides/location/search`](#get-rideslocationssearch)               | Search locations by name  |
-| `POST`   | [`/rides/location`](#post-rideslocation)                            | Create a new location     |
+| `GET`    | [`/rides/search/location`](#get-ridessearchlocation)                | Search locations by name  |
 | `POST`   | [`/rides/manage/requests/:rideId`](#post-ridesmanagerequestsrideid) | Accept/Deny ride request  |
 | `PUT`    | [`/rides/manage/update/:rideId`](#put-ridesmanageupdaterideid)      | Update a ride             |
 | `DELETE` | [`/rides/manage/delete/:rideId`](#delete-ridesmanagedeleterideid)   | Delete a ride             |
@@ -621,36 +619,7 @@ No body required.
 - 200: Success
 - 404: Ride not found
 
-#### `GET` `/rides/location/id`
-
-Fetches a location by its ID.
-
-##### Request:
-
-**Query Parameters:**
-
-```ts
-{
-  id: number; // Location ID
-}
-```
-
-##### Response:
-
-```ts
-{
-  id: number;
-  location: string; // Location name
-}
-```
-
-##### Status Codes:
-
-- 200: Success
-- 400: Email not provided
-- 404: Location not found
-
-#### `GET` `/rides/location/search`
+#### `GET` `/rides/search/location`
 
 Searches for locations by name using fuzzy matching. Returns up to 5 results.
 
@@ -660,52 +629,20 @@ Searches for locations by name using fuzzy matching. Returns up to 5 results.
 
 ```ts
 {
-  location: string; // Location name to search for
+  searchParam: string; // Location name to search for
 }
 ```
 
 ##### Response:
 
 ```ts
-{
-  id: number;
-  location: string; // Location name
-}
-[];
+string[]; // list of locations
 ```
 
 ##### Status Codes:
 
 - 200: Success (may return empty array)
 - 400: Email not provided
-
-#### `POST` `/rides/location`
-
-Creates a new location. Used when a location doesn't exist yet.
-
-##### Request:
-
-**Query Parameters:**
-
-```ts
-{
-  location: string; // New location name
-}
-```
-
-No body required.
-
-##### Response:
-
-```ts
-number; // The ID of the newly created location
-```
-
-##### Status Codes:
-
-- 200: Success
-- 400: Email not provided
-- 409: Location already exists
 
 #### `POST` `/rides/manage/requests/:rideId`
 
