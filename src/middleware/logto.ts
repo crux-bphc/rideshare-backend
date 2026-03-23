@@ -1,12 +1,12 @@
 import * as jwt from "jose";
 import { RequestHandler } from "express";
-import { logtoClientId, logtoJwkUrl } from "../consts.ts";
+import { logtoJwkUrl } from "../consts.ts";
 import { RideShareJWTPayload } from "../types/jwt.ts";
 
 const JWKSLogToURL = new URL(logtoJwkUrl);
 
 const jwtOptions: jwt.JWTVerifyOptions = {
-  audience: logtoClientId,
+  audience: Deno.env.get("LOGTO_API_RESOURCE"), // Error or default if doesnt exist?
   maxTokenAge: 600000, // 10 min
 };
 
