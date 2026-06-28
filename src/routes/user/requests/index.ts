@@ -4,7 +4,7 @@ import { asyncHandler } from "@/routes/route_handler.ts";
 import { HttpError } from "@/utils/http_error.ts";
 import { StatusCodes } from "http-status-codes";
 import { rides, userBookmarks, userRequests } from "@/db/schema/tables.ts";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { rideResponseObject } from "@/utils/response_schemas.ts";
 const router = express.Router();
 
@@ -13,6 +13,10 @@ const requestSent = async (_req: Request, res: Response) => {
   if (!email) {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
+
+  const order = asc(
+    sql`abs(extract(epoch from (NOW() - ${rides.departureEndTime})))`,
+  );
 
   const requestedRides = await db.select({
     status: userRequests.status,
@@ -26,7 +30,7 @@ const requestSent = async (_req: Request, res: Response) => {
         eq(userBookmarks.rideId, rides.id),
         eq(userBookmarks.userEmail, email),
       ),
-    );
+    ).orderBy(order);
 
   if (!requestedRides.length) throw new HttpError(404, "No requests found");
 
@@ -38,6 +42,10 @@ const requestReceived = async (_req: Request, res: Response) => {
   if (!email) {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
+
+  const order = asc(
+    sql`abs(extract(epoch from (NOW() - ${rides.departureEndTime})))`,
+  );
 
   const requestedRides = await db.select({
     requestSender: userRequests.userEmail,
@@ -54,7 +62,7 @@ const requestReceived = async (_req: Request, res: Response) => {
         eq(userBookmarks.rideId, rides.id),
         eq(userBookmarks.userEmail, email),
       ),
-    );
+    ).orderBy(order);
 
   if (!requestedRides.length) {
     throw new HttpError(404, "User has no requests.");

@@ -5,7 +5,7 @@ import { HttpError } from "@/utils/http_error.ts";
 import { StatusCodes } from "http-status-codes";
 import { rideIDSchema } from "../../../validators/ride_validators.ts";
 import { rides, userBookmarks } from "@/db/schema/tables.ts";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { rideResponseObject } from "../../../utils/response_schemas.ts";
 
 const router = express.Router();
@@ -59,10 +59,15 @@ const getBookmarks = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
+  const order = asc(
+    sql`abs(extract(epoch from (NOW() - ${rides.departureEndTime})))`,
+  );
+
   const found_rides = await db.select(rideResponseObject)
     .from(userBookmarks)
     .where(eq(userBookmarks.userEmail, email))
-    .innerJoin(rides, eq(rides.id, userBookmarks.rideId));
+    .innerJoin(rides, eq(rides.id, userBookmarks.rideId))
+    .orderBy(order);
 
   if (!found_rides.length) {
     throw new HttpError(StatusCodes.NOT_FOUND, "No bookmarks for this user.");

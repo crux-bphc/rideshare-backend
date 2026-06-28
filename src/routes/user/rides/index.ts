@@ -15,6 +15,10 @@ const created = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
+  const order = asc(
+    sql`abs(extract(epoch from (NOW() - ${rides.departureEndTime})))`,
+  );
+
   const createdRides = await db.select(rideResponseObject)
     .from(rides)
     .where(eq(rides.createdBy, email))
@@ -24,7 +28,7 @@ const created = async (_req: Request, res: Response) => {
         eq(userBookmarks.rideId, rides.id),
         eq(userBookmarks.userEmail, email),
       ),
-    );
+    ).orderBy(order);
 
   if (!createdRides.length) {
     throw new HttpError(404, "User has not made any rides.");
@@ -39,6 +43,10 @@ const joined = async (_req: Request, res: Response) => {
     throw new HttpError(StatusCodes.BAD_REQUEST, "Email was not provided.");
   }
 
+  const order = asc(
+    sql`abs(extract(epoch from (NOW() - ${rides.departureEndTime})))`,
+  );
+
   const joinedRides = await db.select(rideResponseObject)
     .from(rideMembers)
     .where(eq(rideMembers.userEmail, email))
@@ -52,7 +60,7 @@ const joined = async (_req: Request, res: Response) => {
         eq(userBookmarks.rideId, rides.id),
         eq(userBookmarks.userEmail, email),
       ),
-    );
+    ).orderBy(order);
 
   if (!joinedRides.length) {
     throw new HttpError(404, "User has not joined any rides.");
